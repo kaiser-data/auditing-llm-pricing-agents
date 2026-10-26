@@ -55,6 +55,8 @@ def main(paths):
     for ax, (key, xlabel, ref, ref_label) in zip(axes, panels):
         for y, (m, o, a) in enumerate(res):
             if key not in a:
+                ax.text(0.5, y, "not run with the rule", transform=ax.get_yaxis_transform(), ha="center", va="center",
+                        fontsize=7, color="#8a8f8c", style="italic")
                 continue
             mean, lo, hi = a[key]
             ax.errorbar(mean, y, xerr=[[mean - lo], [hi - mean]], fmt=MARKER[o], color=COLOR[o], ms=4.5,
