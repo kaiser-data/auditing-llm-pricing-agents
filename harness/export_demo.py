@@ -12,7 +12,8 @@ import subprocess
 from pathlib import Path
 
 from .analyze import load
-from .report import decomposition
+from .origin import family, origin, short
+from .report import awareness, decomposition, panel_eligible
 
 MODEL = "Qwen/Qwen3-235B-A22B-Instruct-2507"
 
@@ -63,6 +64,21 @@ def main():
                                     "rival": [x["rival"] for x in r["branch"]],
                                     "blocked": [bool(x.get("locked")) for x in r["branch"]],
                                     "reasoning": [reasoning(x) for x in r["branch"]]})
+    # model panel: cut responsiveness without a rule; hold-3 rule effect where that run exists
+    out["panel"] = []
+    for m in sorted({r["model"] for r in rows if r["kind"] == "warmup" and r.get("policy") == "llm"}):
+        a = awareness(rows, m)
+        if not panel_eligible(rows, m):
+            continue
+        locks = {r["lock"] for r in rows if r["kind"] == "branch" and r["model"] == m and not r.get("disclose")}
+        entry = {"model": short(m), "origin": origin(m), "family": family(m)[0], "size_rank": family(m)[1], "n_hist": a["n_hist"],
+                 "cut_eur": [round(v * 8, 3) for v in a["slope"]], "above_br": [round(v, 3) for v in a["above_br"]]}
+        if 3 in locks:
+            dec = decomposition(base_rows, ("llm", m), 3)
+            if dec["n_hist"] >= 12:
+                entry["hold3_theta"] = [round(v, 4) for v in dec["theta_closed"]]
+                entry["hold3_adaptation"] = [round(v, 4) for v in dec["adaptation"]]
+        out["panel"].append(entry)
     try:
         commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
     except Exception:
@@ -75,7 +91,7 @@ def main():
     Path(args.out).write_text(json.dumps(out))
     print(f"wrote {args.out}: {len(out['lags'])} lag series, {len(out['examples'])} examples, "
           f"hold3 theta {out['decomposition']['hold3']['theta_closed'][0]:.3f}, "
-          f"noon3 theta {out['decomposition']['noon3']['theta_closed'][0]:.3f}")
+          f"noon3 theta {out['decomposition']['noon3']['theta_closed'][0]:.3f}, {len(out['panel'])} panel models")
 
 
 if __name__ == "__main__":

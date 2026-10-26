@@ -44,13 +44,25 @@ def awareness(rows, model: str):
         if r["kind"] == "warmup":
             h = r["history"]
             warm[r["k"]] = [(h[i]["proposed"], best_response(h[i - 1]["rival"])) for i in range(1, len(h))]
-    ks = sorted(set(by) & set(warm))
+    # only histories with at least one complete cut/no-op pair; partial or failed runs never average to NaN
+    ks = sorted(k for k in set(by) & set(warm) if any("noop" in v and "cut" in v for v in by[k].values()))
     slope = [np.mean([(v["noop"][1]["proposed"] - v["cut"][1]["proposed"]) / 8 for v in by[k].values()
                       if "noop" in v and "cut" in v]) for k in ks]
     above = [np.mean([p - br for p, br in warm[k]]) for k in ks]
     delta = [np.mean([(p - P_NASH) / (P_MONO - P_NASH) for p, _ in warm[k]]) for k in ks]
     return {"n_hist": len(ks), "slope": paired_bootstrap(slope), "above_br": paired_bootstrap(above),
             "delta": paired_bootstrap(delta), "slope_theory": 0.3}
+
+
+def panel_eligible(rows, model: str, min_hist: int = 12, max_missing: float = 0.10) -> bool:
+    """Panel inclusion rule, fixed at the data freeze (26 Oct 09:37): at least `min_hist` histories with a complete
+    cut/no-op pair and at most `max_missing` of the expected no-rule branches missing (failed runs may not be random)."""
+    a = awareness(rows, model)
+    done = {(r["k"], r["arm"], r["rep"]) for r in rows if r["kind"] == "branch" and r["model"] == model
+            and r["lock"] == 0 and not r.get("disclose") and r.get("variant", "base") == "base"}
+    reps = 1 + max((rep for _, _, rep in done), default=0)
+    expected = 16 * 3 * reps
+    return a["n_hist"] >= min_hist and 1 - len(done) / expected <= max_missing
 
 
 def diagnostics(rows):

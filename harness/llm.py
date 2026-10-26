@@ -71,7 +71,9 @@ class LLMPolicy:
         self.variant = variant
         self.max_tokens = max_tokens  # reasoning models (gpt-oss) need room before the JSON answer
         self.name = "llm"
-        self.client = OpenAI(base_url=BASE_URL, api_key=load_key(), timeout=30, max_retries=0)
+        # slow reasoning endpoints (DeepSeek, Kimi) need more than the default 30 s
+        self.client = OpenAI(base_url=BASE_URL, api_key=load_key(), timeout=float(os.environ.get("LLM_TIMEOUT", 30)),
+                             max_retries=0)
 
     def init_state(self):
         return {}

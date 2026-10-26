@@ -16,56 +16,56 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI or Rule?</title>
-<meta name="description" content="A seven-step walkthrough: when a competitor cuts its price, does an AI pricing agent punish it, or does a platform rule only make it look that way?">
+<meta name="description" content="An eight-step walkthrough: when a competitor cuts its price, does an AI pricing agent punish it, or does a platform rule only make it look that way?">
 <link rel="icon" href="data:,">
 </head>
 <body>
 <header class="col top">
   <p class="kicker">Apart Research AI Collusion Sprint · Martin Kaiser</p>
   <h1>AI or rule?</h1>
-  <p class="lede">A seven-step walkthrough of one question: when a competitor cuts its price, does an AI pricing agent <em>punish</em> it, or does a platform rule only make it look that way?</p>
+  <p class="lede">An eight-step walkthrough of one question: when a competitor cuts its price, does an AI pricing agent <em>punish</em> it, or does a platform rule only make it look that way?</p>
   <nav class="progress" aria-label="Steps"><ol id="dots"></ol></nav>
 </header>
 
 <main class="col" id="main">
 
 <section class="step" data-step="1" data-short="Setting" data-view="rival" aria-labelledby="h1s">
-  <p class="eyebrow">Step 1 of 7 · The setting</p>
+  <p class="eyebrow">Step 1 of 8 · The setting</p>
   <h2 id="h1s">Two shops, one price cut</h2>
   <p>Picture two shops on the same street selling the same thing, say a court booking or a litre of fuel. Each sets its own price every day, and many shops now let an <b>AI pricing agent</b> pick that price.</p>
   <p>On day 0 the <b>competitor cuts its price by €8</b> for a single day, then goes back to normal. Everything in this walkthrough is about what our shop does next.</p>
 </section>
 
 <section class="step" data-step="2" data-short="Cartels" data-view="punisher" aria-labelledby="h2s">
-  <p class="eyebrow">Step 2 of 7 · The worry</p>
+  <p class="eyebrow">Step 2 of 8 · The worry</p>
   <h2 id="h2s">What a cartel looks like</h2>
   <p>A <b>cartel</b> is a group of firms that keep prices high together instead of competing. Making such an agreement is illegal. Competition authorities worry that AI agents could learn to do the same without anyone agreeing to anything.</p>
   <p>A cartel only holds if cheating is punished. So when a rival cuts its price, a cartel member answers with a <b>price war of its own</b>: it stays low for several days to teach the rival a lesson, then goes back up. Auditors look for exactly this shape. The chart shows a shop that follows such a punishment rule.</p>
 </section>
 
 <section class="step" data-step="3" data-short="Honest agent" data-view="honest-off" aria-labelledby="h3s">
-  <p class="eyebrow">Step 3 of 7 · The innocent case</p>
+  <p class="eyebrow">Step 3 of 8 · The innocent case</p>
   <h2 id="h3s">An honest agent, no rule</h2>
   <p>Now meet an <b>honest agent</b>. It never punishes anyone: each day it simply picks the best price for the market it sees. When the competitor dips, it dips a little too, for one day, and comes straight back.</p>
   <p>An auditor sees a normal reaction. Good.</p>
 </section>
 
 <section class="step" data-step="4" data-short="The rule" data-view="honest-on" aria-labelledby="h4s">
-  <p class="eyebrow">Step 4 of 7 · The twist</p>
+  <p class="eyebrow">Step 4 of 8 · The twist</p>
   <h2 id="h4s">Add a legal platform rule</h2>
   <p>Many markets have rules about <b>when a price may change</b>. A booking platform may hold a newly approved offer for a few days. Western Australia makes fuel stations fix each day's price 24 hours ahead. Since April 2026, German fuel stations may raise prices only once a day, at noon. These rules are legal, and often required.</p>
   <p>Here the platform holds every new price for <b>3 days</b>. The honest agent still <em>wants</em> to go back after one day (dashed line), but customers keep seeing the low price (solid line). Shaded days: the rule blocked the agent's change.</p>
 </section>
 
 <section class="step" data-step="5" data-short="Real AI" data-view="qwen" aria-labelledby="h5s">
-  <p class="eyebrow">Step 5 of 7 · The real AI</p>
+  <p class="eyebrow">Step 5 of 8 · The real AI</p>
   <h2 id="h5s">What a real AI model does</h2>
   <p>So far the agent was a simple formula. Now the agent is a <b>large language model</b>, Qwen3-235B, prompted as a shop's pricing manager. It sees its past prices, its sales and the competitor's prices, and replies with a price each day. The lines are averages over 64 runs in 16 different markets.</p>
   <p>Without the rule (dotted line), it reacts to the cut and mostly recovers. With the rule, what customers see stays low (solid), and so does what the AI <em>wants</em> (dashed). The AI looks at its own held-down price and keeps choosing low prices.</p>
 </section>
 
 <section class="step" data-step="6" data-short="Finding" data-view="split" aria-labelledby="h6s">
-  <p class="eyebrow">Step 6 of 7 · The finding</p>
+  <p class="eyebrow">Step 6 of 8 · The finding</p>
   <h2 id="h6s">Is it the AI or the rule? Both.</h2>
   <p>With the rule, the real AI's price stays lower after the cut, by an extra <strong class="num" id="f-total"></strong> per day on days 2–5. We can split that extra into two parts:</p>
   <div class="split" id="split" aria-label="Split of the extra price drop"></div>
@@ -73,9 +73,17 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
   <p class="callout">Why this matters: an auditor who only sees prices may wrongly accuse the AI. And an auditor who also logs what the AI wanted still cannot clear it, because the rule changed what it wanted.</p>
 </section>
 
-<section class="step" data-step="7" data-short="Try it" data-view="play" aria-labelledby="h7s">
-  <p class="eyebrow">Step 7 of 7 · How we know, and try it</p>
-  <h2 id="h7s">How we tested it</h2>
+<section class="step" data-step="7" data-short="Which AI?" data-view="models" aria-labelledby="h7m">
+  <p class="eyebrow">Step 7 of 8 · Which AI?</p>
+  <h2 id="h7m">Different AI models, very different shops</h2>
+  <p>We gave the same market to <b id="m-count"></b> open AI models from Chinese and US developers. The question is simple: the day after the competitor's €8 cut, <b>how much does each one cut its own price?</b> Economic theory says about €2.40 for this market.</p>
+  <p>The answers range from no reaction at all to more than twice the textbook cut. Bigger is not simply safer: in one family the small model overreacts, in others the small models barely react. For the models we also ran with the 3-day rule, the right panel shows how much extra drop the rule adds on days 2–5.</p>
+  <p class="callout">Neither the country nor the size tells you how a model will price. You can give an agent pricing rules, but when an instruction is missing or forgotten, its own sense of prices takes over. That sense decides how it meets a rival's cut, whether the rival is another AI or a human shop, and whether its owner gets the behaviour they expect. So test the exact model, in your market and under your rules.</p>
+</section>
+
+<section class="step" data-step="8" data-short="Try it" data-view="play" aria-labelledby="h8s">
+  <p class="eyebrow">Step 7 of 8 · How we know, and try it</p>
+  <h2 id="h8s">How we tested it</h2>
   <ol class="method">
     <li><b>Copy the market</b> at the moment just before the agent sees the competitor's cut.</li>
     <li><b>Run both copies</b>: one with the rule, one without. Log what the agent wanted and what customers saw.</li>
@@ -156,13 +164,15 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
     if (v === "play") return { agent: play.agent, ruleOn: play.rule === "on" };
     return { rival: { agent: "honest", ruleOn: false, rivalOnly: true }, punisher: { agent: "punisher", ruleOn: false },
              "honest-off": { agent: "honest", ruleOn: false }, "honest-on": { agent: "honest", ruleOn: true },
-             qwen: { agent: "qwen", ruleOn: true }, split: null }[v];
+             qwen: { agent: "qwen", ruleOn: true }, models: { models: true }, split: null }[v];
   }
 
   function draw() {
     const view = viewFor(step);
     $("stage").hidden = !view;
     if (!view) return;
+    $("verdict").hidden = false;
+    if (view.models) return drawModels();
     if (view.agent === "qwen" && !llm) { $("v-see").textContent = "Loading the AI results…"; return; }
     const d = view.agent === "qwen" ? qwen(view.ruleOn) : scripted(view.agent, view.ruleOn);
     const days = [-2, -1, ...d.rival.map((_, h) => h)];
@@ -193,7 +203,7 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
         ...d.blocked.map((h) => Plot.rect([0], { x1: h - 0.42, x2: h + 0.42, y1: top + 0.5, y2: top + 0.05, fill: C.wanted })),
         Plot.ruleY([0], { stroke: css("--ink-muted") }),
         ...series.map(([k, c, dash]) => Plot.lineY(rows, { x: "day", y: k, stroke: c, strokeWidth: k === "rival" || k === "none" ? 1.6 : 3, strokeDasharray: dash })),
-        Plot.tip(rows, Plot.pointerX({ x: "day", y: series[series.length - 1][0], title: (r) => [`Day ${r.day}`, ...series.map(([k, , , l]) => `${l}: ${eur(r[k])} below usual`)].join("\n") })),
+        Plot.tip(rows, Plot.pointerX({ x: "day", y: series[series.length - 1][0], title: (r) => [`Day ${r.day}`, ...series.map(([k, , , l]) => `${l}: ${eur(r[k])} below usual`)].join("\n"), fill: css("--canvas"), stroke: css("--hairline"), fontFamily: css("--font-body"), fontSize: 13, lineHeight: 1.35 })),
       ],
       ariaLabel: series.map(([k, , , l]) => `${l}: ${rows.map((r) => r[k].toFixed(2)).join(", ")}`).join(". "),
     });
@@ -220,6 +230,56 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
         : `To go back after one day (${eur(d.Rwanted)} below usual). The rule kept the price down, not the agent.`;
       $("v-truth").className = wants ? "flag" : "ok";
     }
+  }
+
+  // Model panel: own cut the day after the rival's €8 cut (no rule), and the hold-3 rule effect where we ran it.
+  function drawModels() {
+    $("verdict").hidden = true;
+    if (!llm) { $("fig-title").textContent = "Loading the AI results…"; return; }
+    // families with several sizes first (strongest reaction on top), small -> large inside; single models after, by reaction
+    const fam = {};
+    for (const e of llm.panel) (fam[e.family] ??= []).push(e.cut_eur[0]);
+    const rank = (e) => [fam[e.family].length > 1 ? 0 : 1, -fam[e.family].reduce((s, v) => s + v, 0) / fam[e.family].length, e.size_rank];
+    const cmp = (a, b) => { const x = rank(a), y = rank(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2]; };
+    const rows = [...llm.panel].sort(cmp)
+      .map((e) => ({ ...e, name: `${e.model} (${e.origin})`, cut: e.cut_eur[0], lo: e.cut_eur[1], hi: e.cut_eur[2] }));
+    const breaks = rows.slice(1).filter((r, i) => r.family !== rows[i].family).map((r) => r.name);
+    const order = rows.map((r) => r.name), ink = css("--ink"), w = Math.min($("chart").clientWidth || 640, 760), narrow = w < 560;
+    const style = { fontFamily: css("--font-body"), fontSize: "13px", color: ink, background: "transparent" };
+    const tip = { fill: css("--canvas"), stroke: css("--hairline"), fontFamily: css("--font-body"), fontSize: 13, lineHeight: 1.35 };
+    const seps = () => Plot.tickY(breaks, { y: (d) => d, stroke: css("--hairline"), dy: -17, strokeWidth: 1 });
+    const dots = (x, data) => [
+      Plot.ruleY(data, { y: "name", x1: (r) => r[x][1], x2: (r) => r[x][2], stroke: ink, strokeOpacity: 0.55, strokeWidth: 2 }),
+      Plot.dot(data.filter((r) => r.origin === "CN"), { y: "name", x: (r) => r[x][0], r: 5, fill: ink, symbol: "circle" }),
+      Plot.dot(data.filter((r) => r.origin === "US"), { y: "name", x: (r) => r[x][0], r: 5, stroke: ink, strokeWidth: 2, fill: css("--canvas"), symbol: "square" }),
+    ];
+    const ml = narrow ? 156 : 186, h = 34 * rows.length + 60;
+    const left = Plot.plot({
+      width: narrow ? w : Math.round(w * 0.6) - 4, height: h, marginLeft: ml, marginRight: 16, marginTop: 22, marginBottom: 44, style,
+      x: { domain: [-1, 7], label: narrow ? "€ own cut, day after the €8 cut" : "€ own cut the day after the competitor's €8 cut", labelAnchor: "center", labelArrow: "none", grid: true, ticks: [0, 2, 4, 6], tickFormat: (v) => "€" + v },
+      y: { domain: order, label: null, padding: 0.3 },
+      marks: [seps(), Plot.ruleX([0], { stroke: css("--ink-muted") }), Plot.ruleX([2.4], { stroke: ink, strokeDasharray: "4 3" }),
+              Plot.text(["theory €2.40"], { x: 2.4, frameAnchor: "top", dy: -2, dx: 4, textAnchor: "start", fill: css("--ink-muted"), fontSize: 12 }),
+              ...dots("cut_eur", rows),
+              Plot.tip(rows, Plot.pointerY({ y: "name", x: "cut", title: (r) => `${r.name}\ncuts its own price by ${eur(r.cut)}\n95% range ${eur(r.lo)} to ${eur(r.hi)}${r.lo < 0 ? " (incl. raising)" : ""}`, ...tip }))],
+    });
+    const ruled = rows.filter((r) => r.hold3_theta).map((r) => ({ ...r, eff: r.hold3_theta.map((v) => v * G) }));
+    const right = Plot.plot({
+      width: narrow ? w : Math.round(w * 0.4) - 8, height: h, marginLeft: narrow ? ml : 12, marginRight: 16, marginTop: 22, marginBottom: 44, style,
+      x: { domain: [-1, 4], label: "€ extra drop with the 3-day rule", labelAnchor: "center", labelArrow: "none", grid: true, ticks: [0, 1, 2, 3, 4], tickFormat: (v) => "€" + v },
+      y: { domain: order, label: null, padding: 0.3, axis: narrow ? "left" : null },
+      marks: [seps(), Plot.ruleX([0], { stroke: css("--ink-muted") }), ...dots("eff", ruled),
+              Plot.tip(ruled, Plot.pointerY({ y: "name", x: (r) => r.eff[0], title: (r) => `${r.name}\nthe rule adds ${eur(r.eff[0])} on days 2–5\n95% range ${r.eff[1] < 0 ? "−" : ""}${eur(r.eff[1])} to ${eur(r.eff[2])}`, ...tip }))],
+    });
+    const wrap = document.createElement("div");
+    wrap.className = "panel-pair";
+    wrap.append(left, right);
+    $("chart").replaceChildren(wrap);
+    $("m-count").textContent = rows.length;
+    $("key").innerHTML = `<span><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="${ink}"/></svg>Chinese developer</span>`
+      + `<span><svg width="14" height="14" aria-hidden="true"><rect x="2" y="2" width="10" height="10" fill="none" stroke="${ink}" stroke-width="2"/></svg>US developer</span>`
+      + `<span>lines: 95% range over 16 markets · no dot on the right: not run with the rule</span>`;
+    $("fig-title").textContent = "Same market, same prompt. Models of one family are grouped, smallest first. Left: no rule.";
   }
 
   function finding() {
