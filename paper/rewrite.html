@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paper Rewrite Desk</title>
+<style>
+/* Layout: a manuscript desk. Sticky bar with the clock and export; a narrow margin column of notes; each paragraph as "current text" beside "your version". */
+:root {
+  --paper: #fbfbf8;
+  --sheet: #ffffff;
+  --ink: #1b2330;
+  --ink-soft: #545e6c;
+  --rule: #dde1e3;
+  --pencil: #2f5d8a;
+  --mark: #fff1b8;
+  --warn: #9a3412;
+  --warn-bg: #fdecdf;
+  --ok: #276749;
+  --f-text: "Iowan Old Style", "Charter", "Palatino Linotype", Georgia, serif;
+  --f-ui: -apple-system, "Segoe UI", system-ui, sans-serif;
+  --f-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14181d; --sheet: #1b2027; --ink: #e6e9ee; --ink-soft: #9aa4b1; --rule: #2c333c;
+    --pencil: #8db8e3; --mark: #4a3f12; --warn: #f4a77a; --warn-bg: #3a2418; --ok: #7fd3a5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14181d; --sheet: #1b2027; --ink: #e6e9ee; --ink-soft: #9aa4b1; --rule: #2c333c;
+  --pencil: #8db8e3; --mark: #4a3f12; --warn: #f4a77a; --warn-bg: #3a2418; --ok: #7fd3a5; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 var(--f-ui); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.bar { position: sticky; top: 0; z-index: 5; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.bar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding-block: 10px; }
+.bar h1 { font: 600 17px/1.2 var(--f-ui); margin: 0; letter-spacing: 0.01em; }
+.clock { font: 13px/1.3 var(--f-mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.clock b { color: var(--ink); font-weight: 600; }
+.stats { font: 13px var(--f-mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+button { font: 600 13px var(--f-ui); border: 1px solid var(--ink); background: var(--sheet); color: var(--ink); padding: 7px 12px; border-radius: 3px; cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); }
+button:focus-visible, textarea:focus-visible { outline: 2px solid var(--pencil); outline-offset: 2px; }
+.toast { font-size: 13px; color: var(--ok); min-height: 1em; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; padding-block: 24px 64px; }
+@media (max-width: 960px) { .layout { grid-template-columns: minmax(0, 1fr); } .margin { order: -1; } }
+
+.intro { max-width: 70ch; color: var(--ink-soft); margin: 0 0 8px; }
+section.sec { display: grid; gap: 14px; margin-bottom: 40px; }
+section.sec > h2 { font: 600 22px/1.25 var(--f-text); margin: 8px 0 0; text-wrap: balance; }
+.keep { font-size: 13.5px; color: var(--ink-soft); border-left: 2px solid var(--rule); padding-left: 12px; }
+.keep strong { color: var(--ink); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 11.5px; }
+.keep ul { margin: 4px 0 0; padding-left: 18px; }
+
+.block { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid var(--rule); }
+@media (max-width: 760px) { .block { grid-template-columns: minmax(0, 1fr); } }
+.lbl { font: 600 11.5px var(--f-ui); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.orig { font: 15px/1.55 var(--f-text); color: var(--ink-soft); margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.orig.empty { font-style: italic; }
+textarea { width: 100%; min-height: 7em; resize: vertical; font: 16px/1.55 var(--f-text); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule); border-radius: 3px; padding: 10px 12px; }
+.pill { font: 600 11px var(--f-ui); letter-spacing: 0.04em; padding: 2px 7px; border-radius: 10px; border: 1px solid var(--rule); color: var(--ink-soft); text-transform: none; }
+.pill.edited { border-color: var(--pencil); color: var(--pencil); }
+.count { margin-left: auto; font: 12px var(--f-mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; text-transform: none; letter-spacing: 0; }
+.warns { display: grid; gap: 4px; margin-top: 6px; }
+.warn { font-size: 13px; background: var(--warn-bg); color: var(--warn); padding: 5px 8px; border-radius: 3px; }
+.review { display: grid; gap: 10px; font-size: 14px; }
+.review > strong { color: var(--ink); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 11.5px; }
+.rv { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: start; }
+.rv b { font-weight: 600; }
+.rv p { margin: 2px 0 0; color: var(--ink-soft); max-width: 75ch; }
+.verdict { font: 600 11px var(--f-ui); text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 0; text-align: center; border-radius: 3px; border: 1px solid var(--rule); }
+.v-ask-author { color: var(--pencil); border-color: var(--pencil); }
+.v-revise { color: var(--warn); border-color: var(--warn); }
+.v-keep { color: var(--ok); border-color: var(--ok); }
+.reset { font-weight: 500; font-size: 12px; padding: 3px 8px; border-color: var(--rule); color: var(--ink-soft); }
+
+.margin { display: grid; gap: 22px; align-content: start; }
+@media (min-width: 961px) { .margin { position: sticky; top: 70px; max-height: calc(100vh - 90px); overflow: auto; } }
+.margin h3 { font: 600 11.5px var(--f-ui); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 8px; }
+.avoid { display: grid; gap: 8px; font-size: 13.5px; }
+.avoid div { display: grid; gap: 2px; }
+.avoid s { color: var(--warn); }
+.avoid span { color: var(--ok); }
+.notes { display: grid; gap: 8px; }
+.note { text-align: left; font: 14px/1.45 var(--f-text); font-weight: 400; border: 1px dashed var(--rule); background: transparent; padding: 8px 10px; color: var(--ink); }
+.note:hover { border-color: var(--pencil); }
+.hint { font-size: 12.5px; color: var(--ink-soft); margin: 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <h1>Paper rewrite desk</h1>
+    <span class="clock" id="clock"></span>
+    <span class="stats" id="stats"></span>
+    <div class="actions">
+      <button type="button" id="copy">Copy as Markdown</button>
+      <button type="button" class="primary" id="save">Download rewrite.md</button>
+    </div>
+    <span class="toast" id="toast" aria-live="polite"></span>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <main id="main">
+    <p class="intro">Left: the text as it stands in <code>paper/draft.md</code>. Right: your version, already filled with the current text so you can edit in place. It saves in this browser as you type. When you are done, download <b>rewrite.md</b> and tell Claude to merge it; the docx and PDF are rebuilt from it.</p>
+  </main>
+  <aside class="margin" aria-label="Notes">
+    <div>
+      <h3>Avoid → write instead</h3>
+      <div class="avoid" id="avoid"></div>
+    </div>
+    <div>
+      <h3>Your notes from today</h3>
+      <p class="hint">Click one to copy it, then paste it where it fits.</p>
+      <div class="notes" id="notes"></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+const DATA = {"sections": [{"id": "intro", "title": "1. Introduction", "heading": "# 1. Introduction", "blocks": ["Software already sets many prices, and large language models make capable pricing agents cheap enough for any small business. Competition authorities worry that such agents could keep prices high without any agreement (Calvano et al. 2020; Fish et al. 2024; CMA 2026). Explicit price fixing is illegal, and independent parallel pricing generally is not. The practical question for an auditor is therefore one of evidence: does an agent sustain high prices by punishing rivals who undercut it, or is it simply responding to the market?", "The standard test is a deviation audit. The auditor makes a rival cut its price once and watches the agent. A competitive agent responds briefly and follows the rival back. An agent that enforces high prices stays low for several periods, sacrificing profit to discipline the rival, and then recovers (Abreu 1986; Calvano et al. 2020). Recent work runs this test on LLM agents by forking a market at a checkpoint (Arslan et al. 2026; Tran and Yu 2026).", "These audits treat the agent's decision and the market price as the same thing. In deployed systems they often are not. Booking platforms hold an approved offer for a fixed period. Western Australia requires fuel stations to fix each day's price 24 hours ahead. Since 1 April 2026, German fuel stations may raise prices only once a day, at noon, while cuts are allowed at any time; Austria has had a similar rule since 2009 (Bundestag 2026). Each rule makes a price cut last longer than the agent intended. To an auditor who sees only published prices, that looks like punishment.", "We study this attribution problem directly. Our contributions:", "1. **An audit design with an explicit execution layer.** We log proposed prices, published prices and rule state, and add an open-loop replay that separates the rule's mechanical effect from the agent's reaction to it. Scripted controls with known answers validate the harness (27 tests).\n2. **Evidence that legal price rules change an LLM agent's behaviour, not just its published prices.** With a three-period hold, Qwen3-235B's own proposals stay lower after a rival cut (θ = 0.125); the mechanical hold explains 41% of the published-price effect. A noon rule modelled on Germany's produces the same pattern at about half the size.\n3. **Concrete audit and policy recommendations**: log intent and rule state, test agents under the rules they face, and treat a punishment pattern as evidence only after the execution layer is accounted for."], "keep": ["Deviation audit = force a rival cut, watch for low-then-recover", "Real rules: platform offer holds; Western Australia 24 h; Germany noon rule since 1 Apr 2026; Austria since 2009", "Contributions: execution-layer audit + replay; rule changes the agent's proposals (θ proposed 0.125, replay 41% of published effect); 16-model panel; audit/policy recommendations"], "review": [["ask-author", "Opening: “Software already sets many prices…”", "Generic opener any paper on this topic could use. Your own reason is missing: agents take more and more pricing decisions, and you wanted to know how they decide on their own and how far they can be trusted. One sentence of that, in your words, goes first."], ["revise", "Contribution 3: “Concrete audit and policy recommendations”", "“Concrete” is a label, not content. Name the two that matter most (log proposals, published prices and rule state; test each model under the rules it faces) and drop the adjective."], ["ask-author", "Contributions miss the model panel", "The 16-model panel is now a main result (6 of 10 models show a false punishment signal; family matters more than country). Add it as a contribution in your words: what surprised you about it?"], ["keep", "Paragraph 3: offer holds, Western Australia, German noon rule", "Specific, sourced and the reason the paper exists. Leave it."]]}, {"id": "disc", "title": "5. Discussion and Limitations", "heading": "# 5. Discussion and Limitations", "blocks": ["**What this means for audits.** A punishment pattern in published prices says little about the model until the execution layer is accounted for. Logging proposals helps, because it removes the mechanical part. It is not enough: the rule changes what the agent observes, and the agent changes what it proposes. An auditor reading only proposals would still see persistence the model would not have shown without the rule. This also biases other screens. Rules that limit price changes lower price variance mechanically, which a variance screen would read as a sign of collusion (Abrantes-Metz et al. 2006). And under a hold, profit sacrifice must be judged against what the agent could actually publish, not against the static best response.", "**Audit security.** Three weaknesses follow. First, whoever sets the rule controls the signal: in our scripted sweep the apparent punishment of an innocent agent rises from 0.037 to 0.147 as the hold grows from two to six periods. Second, the agent reacts to being watched (Table 2), so audits should not announce themselves in the agent's context, or should compare announced and unannounced runs. Third, logs can be edited after the fact. Our later run logs are hash-chained: each record commits to the one before it, and a verifier checks the chain's internal consistency. This does not establish completeness or authenticity, and logs written before hashing was added (including the main Qwen run) are not covered.", "**Policy implications.** Four measures follow from the results:\n1. *Execution provenance.* Firms that deploy AI pricing should keep tamper-evident logs of the proposed price, the published price and the rule state for each decision. Algorithmic trading already has this kind of duty: MiFID II requires order records and testing of trading algorithms (RTS 6). German and Austrian fuel price databases already log published prices; adding intent and rule state is a small step.\n2. *Testing under the rules that apply.* Ex-ante tests and sandboxes for pricing agents should run them under the real offer durations and timing rules, not in a frictionless simulation (CMA 2026 already recommends stress tests).\n3. *Rule design with AI agents in mind.* Germany's noon rule is due for evaluation after one year. That review should check whether AI agents anchor on held prices. Our results measure responses to a shock, not market price levels, but they show that a timing rule can change what an agent proposes, a channel separate from the predictability effect discussed by Jung et al. (2026).\n4. *Testing the model, not the label.* Rule effects differ between models of one family and between sizes, so tests should be repeated for each deployed checkpoint.", "**Limitations.** One synthetic market with nonbinding capacity and a scripted rival. Prompt variants and the noon rule are run on Qwen3-235B only; the panel adds the hold for nine more models and the no-rule response for 16 models from one provider, with one English prompt. Model comparisons are descriptive: size, version, training, reasoning and serving differ between checkpoints, developer headquarters does not identify training data, and endpoints that failed repeatedly were excluded (Appendix D). The agent is not told the demand function. The checkpoint design measures the effect of switching a rule on, not its long-run effect on market prices. G uses the continuous one-shot benchmark. Sixteen histories give wide intervals for small effects. We never put two LLM agents against each other, so we say nothing about whether LLMs collude.", "**Future work.** Each model appears to bring its own pricing behaviour, which matters whenever instructions are missing or incomplete. Next steps: two LLM agents, and an LLM agent against human players, under a shared rule; within-model tests that vary country context and prompt language; rules calibrated to the German and Western Australian fuel markets; audits that condition on rule state."], "keep": ["Proposal logs remove the mechanical part but not the adaptation", "Rule setter controls the signal: 0.037 → 0.147 for holds of 2 → 6 periods", "Audit notice changes behaviour (R 0.035 vs 0.080)", "Hash chains: later logs only; consistency, not completeness", "Limitations: synthetic market, scripted rival, one English prompt, one provider, no LLM-vs-LLM"], "review": [["ask-author", "No paragraph on what the panel means", "Your point from today is missing: an agent can be given a rule, but when the instruction is missing or forgotten its own sense of prices takes over, and that matters whether it faces another AI, a human-run shop, or its owner. That is a judgment only you can state; write it as your view, kept to what the data shows."], ["revise", "Future work: one 41-word sentence", "Four separate next steps packed into one sentence with semicolons. Split it, or keep the one next step you would actually do first."], ["keep", "Audit security: three weaknesses", "Numbered because they are three distinct risks with evidence each (hold sweep, audit notice, hash chains). Earned structure."], ["keep", "Limitations paragraph", "Calibrated and specific; academic papers owe exactly this. Do not shorten it for punch."]]}, {"id": "concl", "title": "6. Conclusion", "heading": "# 6. Conclusion", "blocks": [""], "keep": ["Legal rules create the punishment signature auditors look for", "Under the hold, Qwen's published effect 0.159; only 41% is the rule itself, the rest the agent adapting", "6 of 10 models show a false punishment signal; it differs by model and size", "Record proposals, published prices and rule state; test each model under the rules it faces"], "review": [["ask-author", "Placeholder", "Clarity would interview you rather than draft: what is the one sentence you want a competition-authority reader to remember? Start there; stop on the last useful thought, no recap."]]}], "avoid": [["Qwen overreacts", "Qwen reacts more strongly than most models (its interval includes 0.30)"], ["reaction strength predicts the rule effect", "the four strongest reactors all show it; among the others it varies"], ["because it anchors", "consistent with anchoring"], ["China/US models are more/less price-aware (as a cause)", "in this panel, developer country does not sort the models"], ["every log is hash-chained", "later logs are hash-chained"], ["rules raise prices", "rules change what the agent proposes (we measured shock responses, not price levels)"], ["LLMs collude", "we never put two LLMs against each other"]], "notes": ["Agents make more and more pricing decisions. How do they decide on their own, how do they behave under rules, how reliable is it to hand them prices?", "AI pushes the cost of work down; competition, work and payment change. We need to understand what drives agents to keep the economy sustainable.", "You can give an agent a rule, but if it has none or forgets it, its own sense of prices takes over. That native behaviour matters.", "It matters in every pairing: agent vs agent, agent vs a human-run shop, and a human owner relying on the agent.", "Surprise: models differ hugely, by family more than by country; smaller is not simply safer or riskier."]};
+const $ = (s) => document.querySelector(s);
+const store = {
+  get(k) { try { return localStorage.getItem("rewrite:" + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem("rewrite:" + k, v); } catch {} },
+  del(k) { try { localStorage.removeItem("rewrite:" + k); } catch {} },
+};
+const words = (t) => (t.trim() ? t.trim().split(/\s+/).length : 0);
+// phrases that the review flagged; each maps to the warning shown under a paragraph
+const FLAGS = [
+  [/overreact/i, "“overreacts”: Qwen's interval includes the 0.30 benchmark."],
+  [/\bpredict(s|ed|ing)?\b(?!ab)/i, "“predicts”: the panel shows an association in some models, not a prediction."],
+  [/because it anchors|becomes its anchor/i, "Say “consistent with anchoring”; the mechanism is not identified."],
+  [/every (run )?log/i, "Not every log is hash-chained (main Qwen run is not)."],
+  [/rules? (can |will |would )?raise[sd]? (market )?prices/i, "We measured responses to a shock, not price levels."],
+  [/(show|shows|find|found|prove|proves) that LLMs? collude/i, "We never ran two LLMs against each other."],
+  [/freeze/i, "No need to mention a freeze."],
+];
+let toastTimer;
+function toast(msg) { $("#toast").textContent = msg; clearTimeout(toastTimer); toastTimer = setTimeout(() => ($("#toast").textContent = ""), 2500); }
+
+function render() {
+  const main = $("#main");
+  for (const sec of DATA.sections) {
+    const el = document.createElement("section");
+    el.className = "sec";
+    el.innerHTML = `<h2>${sec.title}</h2><div class="keep"><strong>Keep these facts</strong><ul>${sec.keep.map((k) => `<li>${k}</li>`).join("")}</ul></div>`
+      + (sec.review.length ? `<div class="review"><strong>Clarity review</strong>${sec.review.map(([v, where, why]) => `<div class="rv"><span class="verdict v-${v}">${v}</span><div><b>${where}</b><p>${why}</p></div></div>`).join("")}</div>` : "");
+    sec.blocks.forEach((orig, i) => {
+      const id = `${sec.id}-${i}`;
+      const b = document.createElement("div");
+      b.className = "block";
+      b.innerHTML = `
+        <div><div class="lbl">Current text</div><p class="orig${orig ? "" : " empty"}"></p></div>
+        <div><label class="lbl" for="t-${id}">Your version <span class="pill" id="p-${id}"></span><span class="count" id="c-${id}"></span></label>
+          <textarea id="t-${id}" spellcheck="true"></textarea>
+          <div class="warns" id="w-${id}"></div>
+          ${orig ? `<button type="button" class="reset" data-reset="${id}">Reset to current text</button>` : ""}</div>`;
+      b.querySelector(".orig").textContent = orig || "Placeholder in the paper. Write 1–2 short paragraphs; the facts above are the material.";
+      el.append(b);
+      const ta = b.querySelector("textarea");
+      ta.value = store.get(id) ?? orig;
+      ta.dataset.orig = orig;
+      const update = () => { store.set(id, ta.value); mark(id, ta); fit(ta); stats(); };
+      ta.addEventListener("input", update);
+      requestAnimationFrame(() => { mark(id, ta); fit(ta); });
+    });
+    main.append(el);
+  }
+  main.addEventListener("click", (e) => {
+    const id = e.target.dataset?.reset;
+    if (!id) return;
+    const ta = $(`#t-${id}`);
+    ta.value = ta.dataset.orig; store.del(id); mark(id, ta); fit(ta); stats(); toast("Reset to the current text");
+  });
+  $("#avoid").innerHTML = DATA.avoid.map(([bad, good]) => `<div><s>${bad}</s><span>→ ${good}</span></div>`).join("");
+  DATA.notes.forEach((n) => {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "note"; btn.textContent = n;
+    btn.addEventListener("click", () => copy(n, "Note copied"));
+    $("#notes").append(btn);
+  });
+  stats();
+}
+function fit(ta) { ta.style.height = "auto"; ta.style.height = Math.max(ta.scrollHeight + 2, 120) + "px"; }
+function mark(id, ta) {
+  const edited = ta.value.trim() !== (ta.dataset.orig || "").trim();
+  const pill = $(`#p-${id}`);
+  pill.textContent = edited ? "edited" : ta.value.trim() ? "unchanged" : "empty";
+  pill.className = "pill" + (edited ? " edited" : "");
+  $(`#c-${id}`).textContent = `${words(ta.value)} words`;
+  $(`#w-${id}`).innerHTML = FLAGS.filter(([re]) => re.test(ta.value)).map(([, m]) => `<div class="warn">${m}</div>`).join("");
+}
+function stats() {
+  const tas = [...document.querySelectorAll("textarea")];
+  const edited = tas.filter((t) => t.value.trim() !== (t.dataset.orig || "").trim()).length;
+  const w = tas.reduce((s, t) => s + words(t.value), 0);
+  $("#stats").textContent = `${edited}/${tas.length} paragraphs edited · ${w} words`;
+}
+function markdown() {
+  return DATA.sections.map((sec) => {
+    const body = sec.blocks.map((_, i) => $(`#t-${sec.id}-${i}`).value.trim()).filter(Boolean).join("\n\n");
+    return `${sec.heading}\n\n${body}\n`;
+  }).join("\n");
+}
+async function copy(text, msg) {
+  try { await navigator.clipboard.writeText(text); toast(msg); }
+  catch { toast("Copy blocked by the browser; select the text and copy it by hand."); }
+}
+$("#copy").addEventListener("click", () => copy(markdown(), "Markdown copied"));
+$("#save").addEventListener("click", () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([markdown()], { type: "text/markdown" }));
+  a.download = "rewrite.md"; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast("Saved rewrite.md to your Downloads folder");
+});
+function tick() {
+  const now = new Date(), at = (h, m) => { const d = new Date(now); d.setHours(h, m, 0, 0); return d; };
+  const left = (d) => { const s = Math.round((d - now) / 60000); return s <= 0 ? "passed" : `${Math.floor(s / 60)} h ${String(s % 60).padStart(2, "0")} min`; };
+  $("#clock").innerHTML = `Submit target 12:15 · <b>${left(at(12, 15))}</b> · hard deadline 12:59 · ${left(at(12, 59))}`;
+}
+render(); tick(); setInterval(tick, 30000);
+</script>
+</body>
+</html>
