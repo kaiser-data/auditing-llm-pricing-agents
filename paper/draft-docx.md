@@ -113,7 +113,7 @@ We compute θ for published prices (what an auditor sees) and for proposed price
 
 ![](table3.png){width=6.3in}\
 
-**Audit security and policy.** Whoever sets the rule controls the signal: the apparent punishment of an innocent scripted agent rises from 4% to 15% of the gap as the hold grows from two to six periods. Agents react to being watched (Table 2), so audits should not announce themselves. Logs can be edited, so firms that deploy AI pricing should keep tamper-evident logs of the proposed price, the published price and the rule state, as algorithmic trading already must (MiFID II, RTS 6); our later logs are hash-chained, the main Qwen run predates this. Tests should run under the real offer durations and timing rules (CMA 2026 recommends stress tests) and be repeated for each deployed checkpoint, and the review of Germany's noon rule should check whether AI agents anchor on held prices.
+**Audit security and policy.** Whoever sets the rule controls the signal: the apparent punishment of an innocent scripted agent rises from 4% to 15% of the gap as the hold grows from two to six periods. Agents react to being watched (Table 2), so audits should not announce themselves. Our later logs are hash-chained; the main Qwen run predates this. Four measures follow:
 
 1. *Execution provenance.* Firms that deploy AI pricing should keep tamper-evident logs of the proposed price, the published price and the rule state for each decision. Algorithmic trading already has this duty (MiFID II, RTS 6).
 2. *Testing under the rules that apply.* Ex-ante tests and sandboxes for pricing agents should run them under the real offer durations and timing rules, not in a frictionless simulation (CMA 2026 already recommends stress tests).
