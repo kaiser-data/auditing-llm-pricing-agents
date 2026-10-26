@@ -48,17 +48,17 @@ def main(paths):
     rank = {f: (len(v) > 1, sum(v) / len(v)) for f, v in fams.items()}
     res.sort(key=lambda t: (rank[family(t[0])[0]], -family(t[0])[1]))
 
-    fig, axes = plt.subplots(1, 2, figsize=(6.9, 0.26 * len(res) + 0.9), sharey=True,
-                             gridspec_kw={"width_ratios": [1.3, 1]})
-    panels = [("slope", "Reaction to an €8 rival cut, no rule\n(own cut ÷ rival cut)", 0.30, "best response 0.30"),
-              ("theta", "Rule effect θ, hold 3\n(share of the Nash–monopoly gap)", 0.0, "")]
+    fig, axes = plt.subplots(1, 2, figsize=(6.9, 0.26 * len(res) + 0.9), sharey=True, sharex=True,
+                             gridspec_kw={"width_ratios": [1, 1]})
+    panels = [("slope", "No rule: own cut after an €8 rival cut\n(% of the rival's cut)", 30, "best response 30%"),
+              ("theta", "What the hold adds\n(% of the competitive–cartel gap)", 0.0, "")]
     for ax, (key, xlabel, ref, ref_label) in zip(axes, panels):
         for y, (m, o, a) in enumerate(res):
             if key not in a:
                 ax.text(0.5, y, "not run with the rule", transform=ax.get_yaxis_transform(), ha="center", va="center",
                         fontsize=7, color="#8a8f8c", style="italic")
                 continue
-            mean, lo, hi = a[key]
+            mean, lo, hi = (100 * v for v in a[key])
             ax.errorbar(mean, y, xerr=[[mean - lo], [hi - mean]], fmt=MARKER[o], color=COLOR[o], ms=4.5,
                         elinewidth=1.2, capsize=0, mfc=COLOR[o] if o == "CN" else "white")
             print(f"{key:8s} {m:42s} {o} n={a['n_hist']:2d} {mean:.2f} [{lo:.2f}, {hi:.2f}]")
