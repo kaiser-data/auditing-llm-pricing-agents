@@ -79,15 +79,9 @@ We compute θ for published prices (what an auditor sees) and for proposed price
 
 **Controls give their known answers (Table 1).** The fixed policy never responds. The myopic agent's proposals recover at once (the hold adds 0% to its proposals), but under Rule 1 its published price stays low for two extra periods (7% of the gap, about €1.10). Under Rule 2 it is 4%. The finite trigger responds strongly even without a rule (32%). The hold adds nothing, because its punishment is as long as the hold, but the noon rule makes it look harsher (+15 points) by delaying its recovery.
 
-Table: Table 1. How long prices stay low after a rival's €8 cut, in % of the gap between competitive and cartel price (10% ≈ €1.60 lower on average). First column: R (Eq. 1) without a rule; other columns: θ (Eq. 2). What to see: the scripted agents never change their proposals (0), so everything the rule adds to them comes from the rule; Qwen changes its proposals too (13). Published = what an auditor sees; proposed = what the agent wanted. Brackets: 95% intervals.
+**Table 1.** How long prices stay low after a rival's €8 cut, in % of the gap between competitive and cartel price (10% ≈ €1.60 lower on average). First column: R (Eq. 1) without a rule; other columns: θ (Eq. 2). What to see: the scripted agents never change their proposals (0), so everything the rule adds to them comes from the rule; Qwen changes its proposals too (13). Published = what an auditor sees; proposed = what the agent wanted. Brackets: 95% intervals.
 
-| Agent | Stays low, no rule | Hold adds: published | Hold adds: proposed | Noon adds: published | Noon adds: proposed |
-|---|---|---|---|---|---|
-| Fixed | 0 | 0 | 0 | 0 | 0 |
-| Myopic | 0 | 7 [7, 8] | 0 | 4 [2, 5] | 0 |
-| Sticky λ = 0.6 | 1 | 3 [3, 4] | 0 | 2 [2, 3] | 0 |
-| Finite trigger | 32 | 0 | 0 | 15 [9, 21] | 0 |
-| **Qwen3-235B** | 8 [5, 11] | **16 [11, 21]** | **13 [8, 17]** | **7 [4, 12]** | **5 [3, 8]** |
+![](table1.png){width=6.3in}\
 
 **The LLM's own proposals change under the rule (Figure 1).** Without a rule, Qwen cuts after the rival's cut and mostly recovers within two periods: the gap to the no-shock branch falls from 21% at h = 1 to 10% at h = 2 and 5% at h = 8. Under the hold, its published price stays low throughout (19% at h = 8). Its proposals rebound at h = 2, when the rival is back, but fall again from h = 3 and stay low (17% at h = 8). The proposal paths are consistent with anchoring on the held-down price, but do not identify the mechanism.
 
@@ -105,14 +99,9 @@ Table: Table 1. How long prices stay low after a rival's €8 cut, in % of the g
 
 **Can a better-informed agent avoid the trap? Partly (Table 2).** We ran three prompt variants of the hold experiment. *Disclose* tells the agent the platform rule. *Intent* adds a column with its own proposed prices to its history. *Audited* tells it that a competition authority reviews its decisions for punishing competitors. Each variant roughly halves the effect on proposals, from 13% to 6–7%, but none removes it. The audited variant also shows a second effect: without any rule, the agent's response to the cut is less than half as persistent (3.5% vs 8%). **A second model behaves differently.** gpt-oss-120b does not follow the rival's cut down: without a rule, its price averages slightly *above* the no-shock branch over h = 2–5 (−4%). The rule effect is small: 3% published, 2% proposed, replay ≈ 0.
 
-Table: Table 2. Does telling the agent more help? Qwen3-235B under the hold with three prompt changes, in % of the competitive–cartel gap. What to see: each change roughly halves what the hold adds to the agent's proposals (13 to 6–7), but none brings it to zero; the audit notice also makes the agent react less to the cut even without a rule (8 to 4). Disclose has its own warm-ups, so its comparison is approximate.
+**Table 2.** Does telling the agent more help? Qwen3-235B under the hold with three prompt changes, in % of the competitive–cartel gap. What to see: each change roughly halves what the hold adds to the agent's proposals (13 to 6–7), but none brings it to zero; the audit notice also makes the agent react less to the cut even without a rule (8 to 4). Disclose has its own warm-ups, so its comparison is approximate.
 
-| Prompt variant | Stays low, no rule | Hold adds: published | Hold adds: proposed |
-|---|---|---|---|
-| Base (main run) | 8 [5, 11] | 16 [11, 21] | 13 [8, 17] |
-| Disclose rule | 10 [6, 15] | 9 [4, 14] | 7 [3, 12] |
-| Show own proposals | 11 [7, 15] | 10 [6, 14] | 7 [4, 10] |
-| Audit notice | 4 [1, 6] | 10 [6, 15] | 6 [3, 10] |
+![](table2.png){width=6.3in}\
 
 # 5. Discussion and Limitations
 
@@ -120,13 +109,9 @@ Table: Table 2. Does telling the agent more help? Qwen3-235B under the hold with
 
 **What this means for audits.** A punishment pattern in published prices says little about the model until the execution layer is accounted for. Three readings of the same forced cut tell an investigator what is going on (Table 3). Logging proposals removes the rule-alone part, but not the agent's own adaptation. Rules that limit price changes also lower price variance mechanically, which a variance screen would read as a sign of collusion (Abrantes-Metz et al. 2006).
 
-Table: Table 3. What each audit test tells an investigator (Qwen3-235B, hold; % of the competitive–cartel gap).
+**Table 3.** What each audit test tells an investigator (Qwen3-235B, hold; % of the competitive–cartel gap).
 
-| Test | Question it answers | Qwen3-235B, hold |
-|---|---|---|
-| Published prices after a cut | Punishment pattern? | Yes: 16% (about €2.50) |
-| Replay through the rule | How much is the rule alone? | 7% |
-| Published minus replay | How much is the agent itself? | 9% |
+![](table3.png){width=6.3in}\
 
 **Audit security.** Three weaknesses follow. First, whoever sets the rule controls the signal: in our scripted sweep the apparent punishment of an innocent agent rises from 4% to 15% of the gap as the hold grows from two to six periods. Second, the agent reacts to being watched (Table 2), so audits should not announce themselves in the agent's context, or should compare announced and unannounced runs. Third, logs can be edited after the fact. Our later run logs are hash-chained, which shows edits but not omissions; the main Qwen run predates this.
 
