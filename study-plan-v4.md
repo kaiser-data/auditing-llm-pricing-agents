@@ -78,3 +78,12 @@ Code change: a `--framing` option adding SYSTEM variants in harness/llm.py and t
 - C (framing): cut today, future work.
 - Origin: exploratory wording only — "among these served checkpoints under one English prompt, cut responses differed; developer-country contrasts are exploratory". No permutation test.
 - Paper wording fixes from review: "cut responsiveness" not "price awareness" as a measured construct; "consistent with anchoring" not "because it anchors"; Qwen "overreacts" only as point estimate (CI includes 0.30); slope→θ is not a validated prediction (trigger control reacts strongly with zero hold effect); Discussion should not infer higher market prices.
+
+## 10:25 — freeze lifted by the author
+Author decided to continue collecting data after the 09:37 freeze, because additional size ladders are of interest.
+Resumed: GLM-5.3-Flash (ladder with GLM-5.3), Kimi-K3, muse-spark-open, Qwen3.8-27B, until 11:00. The inclusion rule
+is unchanged (>=12 complete histories, <=10% missing); any model that crosses it after 09:37 is reported as added
+after the first look.
+10:27 — hold-3 extension, rule fixed before any result: run hold 3 for every size-ladder member with a complete
+no-rule run (96/96) that has no hold-3 run yet: Qwen3-30B, DeepSeek-V4-Pro, MiniMax-M3.1-Flash, Nemotron-3-Super,
+Nemotron-3-Ultra. Same settings; stop at 11:00; report what finished.

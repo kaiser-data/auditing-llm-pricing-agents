@@ -38,7 +38,8 @@ def main(paths):
         locks = {r["lock"] for r in rows if r["kind"] == "branch" and r["model"] == m and not r.get("disclose")}
         if 3 in locks:
             dec = decomposition([r for r in rows if not r.get("disclose")], ("llm", m), 3)
-            a = {**a, "theta": dec["theta_closed"]}
+            if dec["n_hist"] >= 12 and all(v == v for v in dec["theta_closed"]):  # complete and finite only
+                a = {**a, "theta": dec["theta_closed"]}
         res.append((m, origin(m), a))
     # families with a size ladder first (largest family mean on top), then single models by slope; small -> large inside
     fams = {}

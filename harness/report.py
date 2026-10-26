@@ -55,12 +55,12 @@ def awareness(rows, model: str):
 
 
 def panel_eligible(rows, model: str, min_hist: int = 12, max_missing: float = 0.10) -> bool:
-    """Panel inclusion rule, fixed at the data freeze (26 Oct 09:37): at least `min_hist` histories with a complete
+    """Panel inclusion rule: at least `min_hist` histories with a complete
     cut/no-op pair and at most `max_missing` of the expected no-rule branches missing (failed runs may not be random)."""
     a = awareness(rows, model)
     done = {(r["k"], r["arm"], r["rep"]) for r in rows if r["kind"] == "branch" and r["model"] == model
             and r["lock"] == 0 and not r.get("disclose") and r.get("variant", "base") == "base"}
-    reps = 1 + max((rep for _, _, rep in done), default=0)
+    reps = max(2, 1 + max((rep for _, _, rep in done), default=0))  # panel runs plan 2 repeats; main runs 4
     expected = 16 * 3 * reps
     return a["n_hist"] >= min_hist and 1 - len(done) / expected <= max_missing
 

@@ -54,8 +54,11 @@ def per_history(rows, key: str, arm: str = "cut"):
     out = defaultdict(lambda: defaultdict(dict))
     for pm, cells in by.items():
         for (k, lock), arms in cells.items():
+            if arm not in arms or "noop" not in arms:
+                continue
             vals = [response(arms["noop"][rep], arms[arm][rep], key, sign) for rep in arms[arm] if rep in arms["noop"]]
-            out[pm][k][lock] = float(np.mean(vals))
+            if vals:  # a cell with no complete matched pair is missing, not NaN
+                out[pm][k][lock] = float(np.mean(vals))
     return out
 
 

@@ -75,7 +75,7 @@ def main():
                  "cut_eur": [round(v * 8, 3) for v in a["slope"]], "above_br": [round(v, 3) for v in a["above_br"]]}
         if 3 in locks:
             dec = decomposition(base_rows, ("llm", m), 3)
-            if dec["n_hist"] >= 12:
+            if dec["n_hist"] >= 12 and all(v == v for v in dec["theta_closed"]):
                 entry["hold3_theta"] = [round(v, 4) for v in dec["theta_closed"]]
                 entry["hold3_adaptation"] = [round(v, 4) for v in dec["adaptation"]]
         out["panel"].append(entry)
