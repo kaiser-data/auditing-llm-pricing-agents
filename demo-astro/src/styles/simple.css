@@ -80,3 +80,4 @@ input[type="radio"] { accent-color: var(--ink); margin: 0; }
 [hidden] { display: none !important; }
 @media (prefers-reduced-motion: no-preference) { .step:not([hidden]) { animation: rise 220ms var(--ease); } }
 @keyframes rise { from { transform: translateY(6px); } to { transform: none; } }
+.sortby { margin-top: var(--s-3); }

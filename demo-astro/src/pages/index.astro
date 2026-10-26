@@ -79,6 +79,11 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
   <p>We gave the same market to <b id="m-count"></b> open AI models from Chinese and US developers. The question is simple: the day after the competitor's €8 cut, <b>how much does each one cut its own price?</b> Economic theory says about €2.40 for this market.</p>
   <p>The answers range from no reaction at all to more than twice the textbook cut. Bigger is not simply safer: in one family the small model overreacts, in others the small models barely react. For the models we also ran with the 3-day rule, the right panel shows how much extra drop the rule adds on days 2–5.</p>
   <p class="callout">Neither the country nor the size tells you how a model will price. You can give an agent pricing rules, but when an instruction is missing or forgotten, its own sense of prices takes over. That sense decides how it meets a rival's cut, whether the rival is another AI or a human shop, and whether its owner gets the behaviour they expect. So test the exact model, in your market and under your rules.</p>
+  <fieldset class="sortby"><legend>Sort the models</legend>
+    <label><input type="radio" name="sort" value="family" checked> By family, small to large</label>
+    <label><input type="radio" name="sort" value="origin"> By country of the developer</label>
+    <label><input type="radio" name="sort" value="cut"> By reaction</label>
+  </fieldset>
 </section>
 
 <section class="step" data-step="8" data-short="Try it" data-view="play" aria-labelledby="h8s">
@@ -135,7 +140,7 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
   const steps = [...document.querySelectorAll(".step")];
   const N = steps.length;
   const FLAG = 0.05 * G;   // a price-only audit flags a drop above €0.79 on days 2–5
-  const play = { agent: "honest", rule: "on" };
+  const play = { agent: "honest", rule: "on", sort: "family" };
   let step = 1, llm = null;
 
   // Scripted agents from the paper's harness: rival usually at €40, cuts by €8 on day 0 only.
@@ -241,9 +246,12 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
     for (const e of llm.panel) (fam[e.family] ??= []).push(e.cut_eur[0]);
     const rank = (e) => [fam[e.family].length > 1 ? 0 : 1, -fam[e.family].reduce((s, v) => s + v, 0) / fam[e.family].length, e.size_rank];
     const cmp = (a, b) => { const x = rank(a), y = rank(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2]; };
-    const rows = [...llm.panel].sort(cmp)
+    const byCut = (a, b) => b.cut_eur[0] - a.cut_eur[0];
+    const sorter = { family: cmp, origin: (a, b) => a.origin.localeCompare(b.origin) || byCut(a, b), cut: byCut }[play.sort];
+    const group = { family: (r) => r.family, origin: (r) => r.origin, cut: () => "" }[play.sort];
+    const rows = [...llm.panel].sort(sorter)
       .map((e) => ({ ...e, name: `${e.model} (${e.origin})`, cut: e.cut_eur[0], lo: e.cut_eur[1], hi: e.cut_eur[2] }));
-    const breaks = rows.slice(1).filter((r, i) => r.family !== rows[i].family).map((r) => r.name);
+    const breaks = rows.slice(1).filter((r, i) => group(r) !== group(rows[i])).map((r) => r.name);
     const order = rows.map((r) => r.name), ink = css("--ink"), w = Math.min($("chart").clientWidth || 640, 760), narrow = w < 560;
     const style = { fontFamily: css("--font-body"), fontSize: "13px", color: ink, background: "transparent" };
     const tip = { fill: css("--canvas"), stroke: css("--hairline"), fontFamily: css("--font-body"), fontSize: 13, lineHeight: 1.35 };
@@ -279,7 +287,8 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
     $("key").innerHTML = `<span><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="${ink}"/></svg>Chinese developer</span>`
       + `<span><svg width="14" height="14" aria-hidden="true"><rect x="2" y="2" width="10" height="10" fill="none" stroke="${ink}" stroke-width="2"/></svg>US developer</span>`
       + `<span>lines: 95% range over 16 markets · no dot on the right: not run with the rule</span>`;
-    $("fig-title").textContent = "Same market, same prompt. Models of one family are grouped, smallest first. Left: no rule.";
+    $("fig-title").textContent = "Same market, same prompt. " + { family: "Models of one family are grouped, smallest first.",
+      origin: "Chinese developers first, then US developers; strongest reaction on top.", cut: "Strongest reaction on top." }[play.sort] + " Left: no rule.";
   }
 
   function finding() {
