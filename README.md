@@ -1,4 +1,4 @@
-# How Price-Aware Are AI Pricing Agents? Rival Price Cuts, Legal Price Rules and False Punishment Signals
+# How Price-Aware Are AI Agents? Rival Cuts and Legal Rules
 
 Research code for an Apart Research AI Collusion Sprint project (Track 2: Detection & Audit), Oct 2026. Author: Martin Kaiser (individual contributor).
 

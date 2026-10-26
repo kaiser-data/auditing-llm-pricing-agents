@@ -27,7 +27,7 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
 <header class="masthead">
   <div class="utility">
     <div class="wrap utility-row">
-      <span>Working paper · How Price-Aware Are AI Pricing Agents? Rival Price Cuts, Legal Price Rules and False Punishment Signals</span>
+      <span>Working paper · How Price-Aware Are AI Agents? Rival Cuts and Legal Rules</span>
       <span class="utility-right">Martin Kaiser · Apart Research AI Collusion Sprint</span>
     </div>
   </div>
@@ -227,7 +227,7 @@ const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
   <p><strong>Execution rules.</strong> Many markets put rules between a price decision and the price customers see. Germany's 2026 fuel-price “noon rule” allows increases only at 12:00 while cuts are allowed at any time; Western Australia's FuelWatch locks each price for 24 hours; platforms can hold an offer for a set time. Here “Hold” and “Noon rule” are simplified versions of these.</p>
   <p><strong>What the demo shows.</strong> A myopic agent that only best-responds to today's rival price returns to normal right away. Behind a hold, its published price stays down anyway, so an auditor reading published prices sees what looks like punishment. Comparing proposed with published prices separates the rule's effect from the agent's. With a real LLM (Qwen3-235B), the rule also changes the proposals, because the model anchors on its own held-down price.</p>
   <p><strong>Limits.</strong> Synthetic linear market, scripted rival, one model, small samples. This demo does not show that any firm or model colludes, and it is not legal advice.</p>
-  <p>Code and paper (“How Price-Aware Are AI Pricing Agents? Rival Price Cuts, Legal Price Rules and False Punishment Signals”): <a href={REPO}>github.com/kaiser-data/auditing-llm-pricing-agents</a> (may still be private). Martin Kaiser, Apart Research AI Collusion Sprint.</p>
+  <p>Code and paper (“How Price-Aware Are AI Agents? Rival Cuts and Legal Rules”): <a href={REPO}>github.com/kaiser-data/auditing-llm-pricing-agents</a> (may still be private). Martin Kaiser, Apart Research AI Collusion Sprint.</p>
 </section>
 </main>
 
