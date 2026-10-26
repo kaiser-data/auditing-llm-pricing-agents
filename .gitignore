@@ -1,0 +1,16 @@
+.env
+.env.*
+__pycache__/
+.pytest_cache/
+*.pyc
+runs/*.log
+paper/*.docx
+.DS_Store
+paper/*template*.txt
+HANDOFF.md
+
+# Supabase CLI scratch
+supabase/.temp/
+
+# Unpublished pre-sprint material
+_private/

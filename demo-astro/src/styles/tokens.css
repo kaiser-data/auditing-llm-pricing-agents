@@ -1,0 +1,128 @@
+/* Design tokens. Structure adapted from a flat-square enterprise design system
+ * (see DESIGN.md): 4px grid, 0px corners, hairlines and surface change instead of shadows.
+ * Colour is reserved for data; chrome is greyscale. */
+
+:root {
+  color-scheme: light dark;
+
+  /* ---- type families (open-licence faces, self-hosted via @fontsource) */
+  --font-display: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-body: "Public Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Spline Sans Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* ---- type scale (size / line-height) */
+  --t-display: clamp(2.125rem, 1.4rem + 3vw, 3.75rem); /* 34 -> 60px, weight 300 */
+  --t-display-lh: 1.12;
+  --t-headline: 1.75rem;   /* 28px */
+  --t-title: 1.25rem;      /* 20px */
+  --t-body-lg: 1.125rem;   /* 18px */
+  --t-body: 1rem;          /* 16px */
+  --t-body-sm: 0.875rem;   /* 14px */
+  --t-caption: 0.75rem;    /* 12px */
+  --t-readout: 1.75rem;    /* 28px mono readouts */
+  --track-body: 0.01em;    /* small positive tracking on body sizes */
+  --track-caption: 0.02em;
+
+  /* ---- spacing (4px base) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --gutter: 16px;
+  --measure: 66ch;
+  --max: 1280px;
+
+  /* ---- shape */
+  --radius-0: 0px;
+  --radius-tag: 2px;
+  --rule: 1px;
+  --rule-strong: 2px;
+
+  /* ---- motion */
+  --ease: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --dur-fast: 110ms;
+
+  /* ---- surfaces and ink (light) */
+  --canvas: #ffffff;
+  --surface-1: #f2f3f2;
+  --surface-2: #e2e4e2;
+  --ink: #161817;
+  --ink-muted: #4e5350;
+  --ink-subtle: #7a7f7c;
+  --hairline: #d9dcda;
+  --hairline-strong: #161817;
+  --inverse-canvas: #161817;
+  --inverse-ink: #f4f5f4;
+  --focus: #161817;
+  --flag: #a3271f;
+  --flag-surface: #fbeceb;
+  --clear: #1f6f5c;
+
+  /* ---- data colours (light) */
+  --c-pub: #1f6f5c;
+  --c-prop: #b4532a;
+  --c-none: #8a8f8c;
+  --c-replay: #3b6fb6;
+  --c-rival: #161817;
+  --c-blocked: #b4532a;
+  --c-window: #3b6fb6;
+  --c-grid: #e4e6e4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --canvas: #141615;
+    --surface-1: #1f2221;
+    --surface-2: #2d3130;
+    --ink: #eef0ee;
+    --ink-muted: #b9beba;
+    --ink-subtle: #8a908c;
+    --hairline: #333836;
+    --hairline-strong: #eef0ee;
+    --inverse-canvas: #eef0ee;
+    --inverse-ink: #141615;
+    --focus: #eef0ee;
+    --flag: #f08b80;
+    --flag-surface: #3a1f1c;
+    --clear: #6cc2a8;
+
+    --c-pub: #5fbf9f;
+    --c-prop: #e58e62;
+    --c-none: #9aa09c;
+    --c-replay: #84aee8;
+    --c-rival: #eef0ee;
+    --c-blocked: #e58e62;
+    --c-window: #84aee8;
+    --c-grid: #2a2e2c;
+  }
+}
+
+:root[data-theme="dark"] {
+  --canvas: #141615;
+  --surface-1: #1f2221;
+  --surface-2: #2d3130;
+  --ink: #eef0ee;
+  --ink-muted: #b9beba;
+  --ink-subtle: #8a908c;
+  --hairline: #333836;
+  --hairline-strong: #eef0ee;
+  --inverse-canvas: #eef0ee;
+  --inverse-ink: #141615;
+  --focus: #eef0ee;
+  --flag: #f08b80;
+  --flag-surface: #3a1f1c;
+  --clear: #6cc2a8;
+
+  --c-pub: #5fbf9f;
+  --c-prop: #e58e62;
+  --c-none: #9aa09c;
+  --c-replay: #84aee8;
+  --c-rival: #eef0ee;
+  --c-blocked: #e58e62;
+  --c-window: #84aee8;
+  --c-grid: #2a2e2c;
+}

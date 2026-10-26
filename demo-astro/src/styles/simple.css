@@ -1,0 +1,80 @@
+/* Walkthrough page: one reading column, one chart stage that each step reconfigures. Tokens from tokens.css. */
+* { box-sizing: border-box; }
+html { background: var(--canvas); }
+body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font-body);
+  font-size: var(--t-body); line-height: 1.6; letter-spacing: var(--track-body); }
+.col { max-width: 46rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.top { padding-block: var(--s-6) 0; display: grid; gap: var(--s-3); }
+.kicker, .eyebrow { margin: 0; font-family: var(--font-mono); font-size: var(--t-caption); color: var(--ink-muted); letter-spacing: var(--track-caption); }
+h1 { margin: 0; font-family: var(--font-display); font-weight: 300; font-size: var(--t-display); line-height: var(--t-display-lh); }
+h2 { margin: var(--s-1) 0 var(--s-3); font-family: var(--font-display); font-weight: 400; font-size: var(--t-headline); line-height: 1.2; text-wrap: balance; }
+.lede { margin: 0; font-size: var(--t-body-lg); color: var(--ink-muted); }
+p { margin: 0 0 var(--s-3); }
+b, strong { font-weight: 600; }
+a { color: var(--ink); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* progress: numbered steps, current one inked */
+.progress ol { list-style: none; margin: var(--s-4) 0 0; padding: 0; display: flex; gap: 0; border-top: var(--rule) solid var(--hairline); flex-wrap: wrap; }
+.progress li { flex: 1 1 0; min-width: 0; }
+.progress button { width: 100%; text-align: left; background: none; border: 0; border-top: var(--rule-strong) solid transparent; margin-top: -1px;
+  padding: var(--s-2) var(--s-1) var(--s-2) 0; font: inherit; font-size: var(--t-caption); color: var(--ink-subtle); cursor: pointer;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.progress button span { font-family: var(--font-mono); margin-right: 4px; }
+.progress button[aria-current="step"] { color: var(--ink); border-top-color: var(--ink); }
+@media (max-width: 640px) { .progress button { font-size: 0; } .progress button span { font-size: var(--t-caption); } }
+
+main { padding-block: var(--s-5) var(--s-7); }
+.step { min-height: 0; }
+.step > p { max-width: var(--measure); }
+
+/* chart stage */
+.stage { margin-top: var(--s-4); border-top: var(--rule) solid var(--hairline); padding-top: var(--s-3); }
+figure { margin: 0; }
+.axis-note { font-size: var(--t-body-sm); color: var(--ink-muted); margin-bottom: var(--s-1); }
+.chart { min-width: 0; }
+.chart svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+.key { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); font-size: var(--t-body-sm); color: var(--ink-muted); margin: var(--s-2) 0 0; }
+.key { margin: var(--s-2) 0 var(--s-1); }
+.key i { display: inline-block; width: 22px; margin-right: 6px; vertical-align: middle; }
+.key i.bar { height: 8px; width: 14px; }
+
+.verdict { margin-top: var(--s-4); display: grid; border-top: var(--rule) solid var(--ink); }
+.verdict p { margin: 0; padding: var(--s-3) 0; border-bottom: var(--rule) solid var(--hairline); display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--s-4); }
+.verdict .lbl { font-size: var(--t-body-sm); color: var(--ink-muted); }
+.verdict.only-see .audit, .verdict.only-see .truth { display: none; }
+.verdict strong { font-family: var(--font-display); font-weight: 400; font-size: var(--t-title); }
+.verdict strong.flag { color: var(--flag); }
+.verdict strong.ok { color: var(--clear); }
+@media (max-width: 560px) { .verdict p { grid-template-columns: minmax(0, 1fr); gap: var(--s-1); } }
+
+/* finding split */
+.split { display: flex; margin: var(--s-4) 0; border: var(--rule) solid var(--ink); min-height: 6.5rem; }
+.split .seg { padding: var(--s-3); display: grid; align-content: start; gap: 2px; min-width: 0; }
+.split .seg b { font-family: var(--font-mono); font-weight: 500; font-size: var(--t-readout); line-height: 1.1; }
+.split .seg span { font-size: var(--t-body-sm); }
+.split .seg small { font-family: var(--font-mono); color: var(--ink-muted); }
+.split .rule { background: var(--surface-1); border-right: var(--rule) solid var(--ink); }
+.split .ai { background: color-mix(in srgb, var(--c-prop) 16%, var(--canvas)); }
+.num { font-family: var(--font-mono); font-weight: 500; }
+.callout { border-left: var(--rule-strong) solid var(--ink); padding-left: var(--s-3); }
+
+.method { padding-left: 1.4rem; margin: 0 0 var(--s-4); display: grid; gap: var(--s-2); max-width: var(--measure); }
+.switches { display: flex; flex-wrap: wrap; gap: var(--s-4); margin: var(--s-2) 0 var(--s-2); }
+fieldset { border: var(--rule) solid var(--hairline); margin: 0; padding: var(--s-2) var(--s-3) var(--s-3); display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); }
+legend { font-family: var(--font-mono); font-size: var(--t-caption); color: var(--ink-muted); padding: 0 4px; }
+label { cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+input[type="radio"] { accent-color: var(--ink); margin: 0; }
+.limits { font-size: var(--t-body-sm); color: var(--ink-muted); margin-top: var(--s-4); max-width: var(--measure); }
+.links { font-size: var(--t-body-sm); }
+
+/* pager */
+.pager { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); margin-top: var(--s-6); padding-top: var(--s-4); border-top: var(--rule) solid var(--hairline); }
+.pager button { font: inherit; font-weight: 600; padding: var(--s-3) var(--s-5); border: var(--rule) solid var(--ink); background: var(--canvas); color: var(--ink); cursor: pointer; border-radius: 0; }
+.pager button.primary { background: var(--inverse-canvas); color: var(--inverse-ink); }
+.pager button:disabled { opacity: 0.35; cursor: default; }
+.pager button[hidden] { display: none; }
+#count { font-family: var(--font-mono); font-size: var(--t-body-sm); color: var(--ink-muted); }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: no-preference) { .step:not([hidden]) { animation: rise 220ms var(--ease); } }
+@keyframes rise { from { transform: translateY(6px); } to { transform: none; } }

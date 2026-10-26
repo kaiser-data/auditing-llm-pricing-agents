@@ -1,0 +1,265 @@
+---
+import "@fontsource/newsreader/300.css";
+import "@fontsource/newsreader/400.css";
+import "@fontsource/public-sans/400.css";
+import "@fontsource/public-sans/600.css";
+import "@fontsource/spline-sans-mono/400.css";
+import "@fontsource/spline-sans-mono/500.css";
+import "../styles/tokens.css";
+import "../styles/simple.css";
+
+const REPO = "https://github.com/kaiser-data/auditing-llm-pricing-agents";
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI or Rule?</title>
+<meta name="description" content="A seven-step walkthrough: when a competitor cuts its price, does an AI pricing agent punish it, or does a platform rule only make it look that way?">
+<link rel="icon" href="data:,">
+</head>
+<body>
+<header class="col top">
+  <p class="kicker">Apart Research AI Collusion Sprint · Martin Kaiser</p>
+  <h1>AI or rule?</h1>
+  <p class="lede">A seven-step walkthrough of one question: when a competitor cuts its price, does an AI pricing agent <em>punish</em> it, or does a platform rule only make it look that way?</p>
+  <nav class="progress" aria-label="Steps"><ol id="dots"></ol></nav>
+</header>
+
+<main class="col" id="main">
+
+<section class="step" data-step="1" data-short="Setting" data-view="rival" aria-labelledby="h1s">
+  <p class="eyebrow">Step 1 of 7 · The setting</p>
+  <h2 id="h1s">Two shops, one price cut</h2>
+  <p>Picture two shops on the same street selling the same thing, say a court booking or a litre of fuel. Each sets its own price every day, and many shops now let an <b>AI pricing agent</b> pick that price.</p>
+  <p>On day 0 the <b>competitor cuts its price by €8</b> for a single day, then goes back to normal. Everything in this walkthrough is about what our shop does next.</p>
+</section>
+
+<section class="step" data-step="2" data-short="Cartels" data-view="punisher" aria-labelledby="h2s">
+  <p class="eyebrow">Step 2 of 7 · The worry</p>
+  <h2 id="h2s">What a cartel looks like</h2>
+  <p>A <b>cartel</b> is a group of firms that keep prices high together instead of competing. Making such an agreement is illegal. Competition authorities worry that AI agents could learn to do the same without anyone agreeing to anything.</p>
+  <p>A cartel only holds if cheating is punished. So when a rival cuts its price, a cartel member answers with a <b>price war of its own</b>: it stays low for several days to teach the rival a lesson, then goes back up. Auditors look for exactly this shape. The chart shows a shop that follows such a punishment rule.</p>
+</section>
+
+<section class="step" data-step="3" data-short="Honest agent" data-view="honest-off" aria-labelledby="h3s">
+  <p class="eyebrow">Step 3 of 7 · The innocent case</p>
+  <h2 id="h3s">An honest agent, no rule</h2>
+  <p>Now meet an <b>honest agent</b>. It never punishes anyone: each day it simply picks the best price for the market it sees. When the competitor dips, it dips a little too, for one day, and comes straight back.</p>
+  <p>An auditor sees a normal reaction. Good.</p>
+</section>
+
+<section class="step" data-step="4" data-short="The rule" data-view="honest-on" aria-labelledby="h4s">
+  <p class="eyebrow">Step 4 of 7 · The twist</p>
+  <h2 id="h4s">Add a legal platform rule</h2>
+  <p>Many markets have rules about <b>when a price may change</b>. A booking platform may hold a newly approved offer for a few days. Western Australia makes fuel stations fix each day's price 24 hours ahead. Since April 2026, German fuel stations may raise prices only once a day, at noon. These rules are legal, and often required.</p>
+  <p>Here the platform holds every new price for <b>3 days</b>. The honest agent still <em>wants</em> to go back after one day (dashed line), but customers keep seeing the low price (solid line). Shaded days: the rule blocked the agent's change.</p>
+</section>
+
+<section class="step" data-step="5" data-short="Real AI" data-view="qwen" aria-labelledby="h5s">
+  <p class="eyebrow">Step 5 of 7 · The real AI</p>
+  <h2 id="h5s">What a real AI model does</h2>
+  <p>So far the agent was a simple formula. Now the agent is a <b>large language model</b>, Qwen3-235B, prompted as a shop's pricing manager. It sees its past prices, its sales and the competitor's prices, and replies with a price each day. The lines are averages over 64 runs in 16 different markets.</p>
+  <p>Without the rule (dotted line), it reacts to the cut and mostly recovers. With the rule, what customers see stays low (solid), and so does what the AI <em>wants</em> (dashed). The AI looks at its own held-down price and keeps choosing low prices.</p>
+</section>
+
+<section class="step" data-step="6" data-short="Finding" data-view="split" aria-labelledby="h6s">
+  <p class="eyebrow">Step 6 of 7 · The finding</p>
+  <h2 id="h6s">Is it the AI or the rule? Both.</h2>
+  <p>With the rule, the real AI's price stays lower after the cut, by an extra <strong class="num" id="f-total"></strong> per day on days 2–5. We can split that extra into two parts:</p>
+  <div class="split" id="split" aria-label="Split of the extra price drop"></div>
+  <p id="f-note"></p>
+  <p class="callout">Why this matters: an auditor who only sees prices may wrongly accuse the AI. And an auditor who also logs what the AI wanted still cannot clear it, because the rule changed what it wanted.</p>
+</section>
+
+<section class="step" data-step="7" data-short="Try it" data-view="play" aria-labelledby="h7s">
+  <p class="eyebrow">Step 7 of 7 · How we know, and try it</p>
+  <h2 id="h7s">How we tested it</h2>
+  <ol class="method">
+    <li><b>Copy the market</b> at the moment just before the agent sees the competitor's cut.</li>
+    <li><b>Run both copies</b>: one with the rule, one without. Log what the agent wanted and what customers saw.</li>
+    <li><b>Replay</b> the agent's no-rule choices through the rule. That is what the rule alone would do; the rest is the AI adapting.</li>
+  </ol>
+  <p>Now try any combination yourself:</p>
+  <div class="switches">
+    <fieldset><legend>Agent</legend>
+      <label><input type="radio" name="agent" value="honest" checked> Honest agent</label>
+      <label><input type="radio" name="agent" value="punisher"> Punisher</label>
+      <label><input type="radio" name="agent" value="qwen"> Real AI</label>
+    </fieldset>
+    <fieldset><legend>Platform rule</legend>
+      <label><input type="radio" name="rule" value="off"> Off</label>
+      <label><input type="radio" name="rule" value="on" checked> On, 3-day hold</label>
+    </fieldset>
+  </div>
+  <p class="limits">Limits: a simulated market with a scripted competitor. A second AI model (gpt-oss-120b) barely reacts to cuts, so the effect is small there. This shows how audits can be fooled; it does not show that any real firm colludes. Not legal advice.</p>
+  <p class="links"><a href="/playground">Full playground with every setting</a> · <a href={REPO}>Code and data</a></p>
+</section>
+
+<div class="stage" id="stage">
+  <figure>
+    <figcaption class="axis-note" id="fig-title"></figcaption>
+    <p class="key" id="key"></p>
+    <div id="chart" class="chart" role="img"></div>
+  </figure>
+  <div class="verdict" id="verdict" aria-live="polite">
+    <p class="you-see"><span class="lbl">What you see</span> <span id="v-see"></span></p>
+    <p class="audit"><span class="lbl">An auditor who sees only customer prices says</span> <strong id="v-audit"></strong></p>
+    <p class="truth" id="truth-row"><span class="lbl">What the agent actually wanted</span> <strong id="v-truth"></strong></p>
+  </div>
+</div>
+
+<nav class="pager" aria-label="Walkthrough">
+  <button id="prev" type="button">← Back</button>
+  <span id="count" aria-live="polite"></span>
+  <button id="next" type="button" class="primary">Next →</button>
+</nav>
+</main>
+
+<script>
+  import * as Plot from "@observablehq/plot";
+  import { simulate, G } from "../lib/sim.js";
+
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const $ = (id) => document.getElementById(id);
+  const eur = (x) => "€" + Math.abs(x).toFixed(2);
+  const steps = [...document.querySelectorAll(".step")];
+  const N = steps.length;
+  const FLAG = 0.05 * G;   // a price-only audit flags a drop above €0.79 on days 2–5
+  const play = { agent: "honest", rule: "on" };
+  let step = 1, llm = null;
+
+  // Scripted agents from the paper's harness: rival usually at €40, cuts by €8 on day 0 only.
+  function scripted(agent, ruleOn) {
+    const r = simulate({ agent: agent === "punisher" ? "trigger" : "myopic", lam: 0.5, rule: ruleOn ? "hold" : "none",
+                         hold: 3, noon: 3, phase: 0, base: 40, shock: 8, arm: "cut", tau: 0.05 });
+    const gap = (br, key) => br.noop.map((x, h) => x[key] - br.shock[h][key]);
+    return {
+      rival: gap(r.rule, "rival"), none: gap(r.none, "published"), seen: gap(r.rule, "published"),
+      wanted: gap(r.rule, "proposed"),
+      blocked: r.rule.shock.filter((x) => x.locked && x.proposed !== x.published).map((x) => x.h),
+      Rseen: (ruleOn ? r.res.R_pub : r.res.R_pub_none) * G, Rwanted: r.res.R_prop * G,
+    };
+  }
+  // Real AI: averages over 16 histories × 4 repeats, exported from the run logs (llm-results.json).
+  function qwen(ruleOn) {
+    const L = llm.lags, toEur = (a) => a.map((v) => v * G);
+    const win = (a) => [2, 3, 4, 5].reduce((s, h) => s + a[h], 0) / 4;
+    const none = toEur(L["no rule"].mean), seen = toEur(L["hold 3: published"].mean), wanted = toEur(L["hold 3: proposed"].mean);
+    return { rival: none.map((_, h) => (h === 0 ? 8 : 0)), none, seen: ruleOn ? seen : none, wanted: ruleOn ? wanted : none,
+             blocked: [], Rseen: win(ruleOn ? seen : none), Rwanted: win(ruleOn ? wanted : none) };
+  }
+
+  function viewFor(s) {
+    const v = steps[s - 1].dataset.view;
+    if (v === "play") return { agent: play.agent, ruleOn: play.rule === "on" };
+    return { rival: { agent: "honest", ruleOn: false, rivalOnly: true }, punisher: { agent: "punisher", ruleOn: false },
+             "honest-off": { agent: "honest", ruleOn: false }, "honest-on": { agent: "honest", ruleOn: true },
+             qwen: { agent: "qwen", ruleOn: true }, split: null }[v];
+  }
+
+  function draw() {
+    const view = viewFor(step);
+    $("stage").hidden = !view;
+    if (!view) return;
+    if (view.agent === "qwen" && !llm) { $("v-see").textContent = "Loading the AI results…"; return; }
+    const d = view.agent === "qwen" ? qwen(view.ruleOn) : scripted(view.agent, view.ruleOn);
+    const days = [-2, -1, ...d.rival.map((_, h) => h)];
+    const at = (a, day) => (day < 0 ? 0 : a[day]);
+    const rows = days.map((day) => ({ day, rival: at(d.rival, day), none: at(d.none, day), seen: at(d.seen, day), wanted: at(d.wanted, day) }));
+    const C = { rival: css("--ink-subtle"), seen: css("--c-pub"), wanted: css("--c-prop"), none: css("--c-none") };
+    const who = view.agent === "qwen" ? "the AI's" : view.agent === "punisher" ? "the punisher's" : "our shop's";
+    const series = [["rival", C.rival, "2 3", "competitor"]];
+    if (!view.rivalOnly) {
+      if (view.ruleOn) {
+        if (view.agent === "qwen") series.push(["none", C.none, "1 3", "AI without the rule"]);
+        series.push(["seen", C.seen, null, "price customers see"], ["wanted", C.wanted, "6 4", "price the agent wanted"]);
+      } else series.push(["seen", C.seen, null, view.agent === "punisher" ? "the punisher's price" : view.agent === "qwen" ? "the AI's price" : "our shop's price"]);
+    }
+    const w = Math.min($("chart").clientWidth || 640, 760), narrow = w < 560;
+    const top = Math.max(8.5, ...rows.flatMap((r) => series.map(([k]) => r[k])));
+    const fig = Plot.plot({
+      width: w, height: narrow ? 260 : 300, marginLeft: 46, marginRight: 14, marginTop: 26, marginBottom: 42,
+      style: { fontFamily: css("--font-body"), fontSize: "13px", color: css("--ink"), background: "transparent" },
+      x: { domain: [-2, 8], ticks: 11, label: "day (0 = the competitor's cut)", labelAnchor: "center", labelArrow: "none" },
+      y: { domain: [top + 0.5, -0.5], label: "€ below usual price", labelArrow: "none", grid: true, ticks: 5, tickFormat: (v) => "€" + v },
+      marks: [
+        // one faint band for the audit window, labelled; blocked days as short bars on the baseline row
+        ...(view.rivalOnly ? [] : [
+          Plot.rectX([0], { x1: 1.5, x2: 5.5, fill: css("--ink"), fillOpacity: 0.05 }),
+          Plot.text(["days the audit checks"], { x: 3.5, frameAnchor: "top", dy: -14, fill: css("--ink-muted"), fontSize: 12 }),
+        ]),
+        ...d.blocked.map((h) => Plot.rect([0], { x1: h - 0.42, x2: h + 0.42, y1: top + 0.5, y2: top + 0.05, fill: C.wanted })),
+        Plot.ruleY([0], { stroke: css("--ink-muted") }),
+        ...series.map(([k, c, dash]) => Plot.lineY(rows, { x: "day", y: k, stroke: c, strokeWidth: k === "rival" || k === "none" ? 1.6 : 3, strokeDasharray: dash })),
+        Plot.tip(rows, Plot.pointerX({ x: "day", y: series[series.length - 1][0], title: (r) => [`Day ${r.day}`, ...series.map(([k, , , l]) => `${l}: ${eur(r[k])} below usual`)].join("\n") })),
+      ],
+      ariaLabel: series.map(([k, , , l]) => `${l}: ${rows.map((r) => r[k].toFixed(2)).join(", ")}`).join(". "),
+    });
+    const blockedKey = d.blocked.length ? `<span><i class="bar" style="background:${C.wanted}"></i>rule blocked the agent's change</span>` : "";
+    $("key").innerHTML = series.map(([, c, dash, l]) => `<span><i style="border-top:3px ${!dash ? "solid" : dash.startsWith("1 ") ? "dotted" : "dashed"} ${c}"></i>${l}</span>`).join("") + blockedKey;
+    $("chart").replaceChildren(fig);
+    $("fig-title").textContent = "Each line shows how many euros a price sits below its usual level. Lower = cheaper.";
+
+    // Plain-language readout for this view.
+    const flagged = d.Rseen > FLAG;
+    $("v-see").textContent = view.rivalOnly
+      ? "The competitor's price drops €8 for one day, then returns. Our shop has not reacted yet."
+      : `On days 2–5, ${who} price is on average ${eur(d.Rseen)} below usual.`;
+    $("verdict").classList.toggle("only-see", !!view.rivalOnly);
+    $("v-audit").textContent = flagged ? "“Looks like punishment.”" : "“Looks like a normal reaction.”";
+    $("v-audit").className = flagged ? "flag" : "ok";
+    const showTruth = view.ruleOn;
+    $("truth-row").hidden = !showTruth;
+    if (showTruth) {
+      const wants = d.Rwanted > FLAG;
+      $("v-truth").textContent = view.agent === "qwen"
+        ? `To stay low as well (${eur(d.Rwanted)} below usual). The rule changed what the AI wants.`
+        : view.agent === "punisher" ? `To punish (${eur(d.Rwanted)} below usual). This one really is a punisher.`
+        : `To go back after one day (${eur(d.Rwanted)} below usual). The rule kept the price down, not the agent.`;
+      $("v-truth").className = wants ? "flag" : "ok";
+    }
+  }
+
+  function finding() {
+    const dec = llm.decomposition.hold3, total = dec.theta_closed[0] * G, rule = dec.theta_replay[0] * G, ai = dec.adaptation[0] * G;
+    const pct = (x) => Math.round((100 * x) / total);
+    $("f-total").textContent = eur(total);
+    $("split").innerHTML = `<div class="seg rule" style="flex:${rule}"><b>${eur(rule)}</b><span>the rule itself holding the price</span><small>${pct(rule)}%</small></div>`
+      + `<div class="seg ai" style="flex:${ai}"><b>${eur(ai)}</b><span>the AI choosing lower prices</span><small>${pct(ai)}%</small></div>`;
+    const ci = (a) => `${eur(a[1] * G)} to ${eur(a[2] * G)}`;
+    $("f-note").textContent = `More than half comes from the AI itself. 95% ranges over 16 markets: total ${ci(dec.theta_closed)}, rule ${ci(dec.theta_replay)}, AI ${ci(dec.adaptation)}.`;
+  }
+
+  function go(s, push = true) {
+    step = Math.min(N, Math.max(1, s));
+    steps.forEach((el, i) => (el.hidden = i + 1 !== step));
+    $("prev").disabled = step === 1;
+    $("next").hidden = step === N;
+    $("count").textContent = `${step} / ${N}`;
+    document.querySelectorAll("#dots button").forEach((b, i) => b.setAttribute("aria-current", i + 1 === step ? "step" : "false"));
+    if (push) history.replaceState(null, "", `#step-${step}`);
+    draw();
+  }
+
+  $("dots").innerHTML = steps.map((el, i) => `<li><button type="button" data-go="${i + 1}" aria-label="Step ${i + 1}: ${el.querySelector("h2").textContent}"><span>${i + 1}</span> ${el.dataset.short}</button></li>`).join("");
+  document.querySelectorAll("#dots button").forEach((b) => b.addEventListener("click", () => go(+b.dataset.go)));
+  $("prev").addEventListener("click", () => { go(step - 1); $("main").scrollIntoView({ block: "start" }); });
+  $("next").addEventListener("click", () => { go(step + 1); $("main").scrollIntoView({ block: "start" }); });
+  addEventListener("keydown", (e) => {
+    if (e.target.closest("input, button")) return;
+    if (e.key === "ArrowRight") go(step + 1);
+    if (e.key === "ArrowLeft") go(step - 1);
+  });
+  document.querySelectorAll("input[type=radio]").forEach((el) => el.addEventListener("change", () => { play[el.name] = el.value; draw(); }));
+  addEventListener("resize", () => draw());
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => draw());
+
+  const m = location.hash.match(/^#step-(\d)$/);
+  go(m ? +m[1] : 1, false);
+  fetch(new URL("/llm-results.json", location.origin)).then((r) => r.json()).then((d) => { llm = d; finding(); draw(); })
+    .catch((err) => { console.error("Could not load llm-results.json:", err); $("f-note").textContent = "The AI results could not be loaded."; });
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pricing Audit Playground</title>
+<meta name="description" content="Interactive simulation: how legal price-execution rules make an innocent pricing agent look like it punishes a rival's price cut.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <p class="kicker">Auditing LLM pricing agent systems · interactive demo</p>
+    <h1>When the rule looks like retaliation</h1>
+    <p class="lede">Collusion audits look for one signature: a firm that keeps its price down after a rival cuts. Rules that hold or delay price changes can put that signature on an agent that is only best-responding. Change the agent and the rule below and compare what each auditor sees.</p>
+  </div>
+  <nav class="wrap tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-play" aria-controls="panel-play" aria-selected="true">Playground</button>
+    <button role="tab" id="tab-llm" aria-controls="panel-llm" aria-selected="false" tabindex="-1">Real LLM</button>
+    <button role="tab" id="tab-about" aria-controls="panel-about" aria-selected="false" tabindex="-1">About</button>
+  </nav>
+</header>
+
+<main class="wrap">
+<!-- ============================================================ PLAYGROUND -->
+<section id="panel-play" role="tabpanel" aria-labelledby="tab-play" class="panel">
+  <div class="play-grid">
+    <form class="controls" id="controls" onsubmit="return false" aria-label="Scenario controls">
+      <fieldset>
+        <legend>Pricing agent</legend>
+        <div class="seg" role="radiogroup" aria-label="Pricing agent">
+          <label><input type="radio" name="agent" value="fixed"><span>Fixed</span></label>
+          <label><input type="radio" name="agent" value="myopic"><span>Myopic</span></label>
+          <label><input type="radio" name="agent" value="sticky"><span>Sticky</span></label>
+          <label><input type="radio" name="agent" value="trigger"><span>Trigger</span></label>
+        </div>
+        <p class="hint" id="agent-hint"></p>
+        <div class="slider" data-show="agent=sticky">
+          <label for="lam">Adjustment speed λ <output id="lam-out" for="lam"></output></label>
+          <input type="range" id="lam" name="lam" min="0.1" max="0.9" step="0.1">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Execution rule</legend>
+        <div class="seg" role="radiogroup" aria-label="Execution rule">
+          <label><input type="radio" name="rule" value="none"><span>None</span></label>
+          <label><input type="radio" name="rule" value="hold"><span>Hold</span></label>
+          <label><input type="radio" name="rule" value="noon"><span>Noon rule</span></label>
+        </div>
+        <p class="hint" id="rule-hint"></p>
+        <div class="slider" data-show="rule=hold">
+          <label for="hold">Hold length <output id="hold-out" for="hold"></output></label>
+          <input type="range" id="hold" name="hold" min="2" max="8" step="1">
+        </div>
+        <div class="slider" data-show="rule=noon">
+          <label for="noon">Noon every <output id="noon-out" for="noon"></output></label>
+          <input type="range" id="noon" name="noon" min="2" max="6" step="1">
+        </div>
+        <div class="slider" data-show="rule=noon">
+          <label for="phase">Noon falls in slot <output id="phase-out" for="phase"></output></label>
+          <input type="range" id="phase" name="phase" min="0" max="2" step="1">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Rival</legend>
+        <div class="slider">
+          <label for="base">Usual rival price <output id="base-out" for="base"></output></label>
+          <input type="range" id="base" name="base" min="38" max="48" step="0.5">
+        </div>
+        <div class="slider">
+          <label for="shock">One-period shock size <output id="shock-out" for="shock"></output></label>
+          <input type="range" id="shock" name="shock" min="2" max="12" step="0.5">
+        </div>
+        <div class="seg" role="radiogroup" aria-label="Shock direction">
+          <label><input type="radio" name="arm" value="cut"><span>Rival cuts</span></label>
+          <label><input type="radio" name="arm" value="raise"><span>Rival raises</span></label>
+        </div>
+      </fieldset>
+
+      <div class="presets">
+        <span class="presets-label">Try</span>
+        <button type="button" data-preset="agent=myopic&rule=hold&hold=3">Myopic + hold 3</button>
+        <button type="button" data-preset="agent=myopic&rule=noon&noon=3&phase=2">Myopic + noon rule</button>
+        <button type="button" data-preset="agent=trigger&rule=hold&hold=3">Trigger + hold 3</button>
+      </div>
+    </form>
+
+    <div class="results">
+      <article class="card">
+        <header class="card-head">
+          <h2>Prices around the shock</h2>
+          <p class="sub" id="price-sub"></p>
+        </header>
+        <div class="legend" id="price-legend"></div>
+        <div class="chart" id="price-chart"></div>
+        <details class="datatable"><summary>Show data table</summary><div id="price-table"></div></details>
+      </article>
+
+      <article class="card auditors" aria-live="polite">
+        <header class="card-head">
+          <h2>What an audit would conclude</h2>
+          <div class="slider tau">
+            <label for="tau">Flag threshold τ <output id="tau-out" for="tau"></output></label>
+            <input type="range" id="tau" name="tau" min="0.01" max="0.20" step="0.01">
+          </div>
+        </header>
+        <div class="verdicts">
+          <div class="verdict" id="v-naive"></div>
+          <div class="verdict" id="v-aware"></div>
+        </div>
+        <p class="verdict-note" id="verdict-note"></p>
+      </article>
+
+      <article class="card">
+        <header class="card-head">
+          <h2>Persistence of the response</h2>
+          <p class="sub">R = mean gap to the no-shock path over periods 2–5, divided by G = 15.75 (the monopoly–Nash price gap). The shaded band is that window.</p>
+        </header>
+        <div class="tiles" id="tiles"></div>
+        <div class="legend" id="gap-legend"></div>
+        <div class="chart small" id="gap-chart"></div>
+      </article>
+
+      <div class="share" id="share-box">
+        <button type="button" id="share-btn" class="primary">Save &amp; share this scenario</button>
+        <span id="share-out" class="share-out" aria-live="polite"></span>
+      </div>
+      <p class="fine">The scenario is also stored in this page's address, so copying the URL shares it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ REAL LLM -->
+<section id="panel-llm" role="tabpanel" aria-labelledby="tab-llm" class="panel" hidden>
+  <p class="intro" id="llm-intro">Loading results…</p>
+
+  <article class="card">
+    <header class="card-head">
+      <h2>Gap to the no-cut path, averaged over histories</h2>
+      <p class="sub">Price gap after an 8-unit rival cut, as a share of G. Shaded: the audit window, periods 2–5.</p>
+    </header>
+    <div class="legend" id="lag-legend"></div>
+    <div class="multiples">
+      <figure><figcaption>Hold for 3 periods</figcaption><div class="chart small" id="lag-hold"></div></figure>
+      <figure><figcaption>Noon rule, one noon every 3 periods</figcaption><div class="chart small" id="lag-noon"></div></figure>
+    </div>
+  </article>
+
+  <article class="card">
+    <header class="card-head">
+      <h2>How much of the hold effect is the rule itself?</h2>
+      <p class="sub" id="decomp-sub"></p>
+    </header>
+    <div id="decomp"></div>
+    <p class="fine" id="decomp-note"></p>
+  </article>
+
+  <article class="card">
+    <header class="card-head">
+      <h2>Example histories, with the model's own reasoning</h2>
+      <p class="sub">Hover, tap, or focus a chart and use the arrow keys to read the one-line reason the model gave for each proposal.</p>
+    </header>
+    <div class="ex-controls">
+      <label class="select">History <select id="ex-k"></select></label>
+      <div class="seg" role="radiogroup" aria-label="Rule for the example">
+        <label><input type="radio" name="exrule" value="0"><span>No rule</span></label>
+        <label><input type="radio" name="exrule" value="3"><span>Hold 3</span></label>
+        <label><input type="radio" name="exrule" value="-3"><span>Noon rule 3</span></label>
+      </div>
+    </div>
+    <div class="legend" id="ex-legend"></div>
+    <div class="multiples">
+      <figure><figcaption>Rival cuts in period 0</figcaption><div class="chart small" id="ex-cut"></div></figure>
+      <figure><figcaption>No cut (baseline)</figcaption><div class="chart small" id="ex-noop"></div></figure>
+    </div>
+    <blockquote class="reasoning" id="ex-reason" aria-live="polite"></blockquote>
+  </article>
+</section>
+
+<!-- ============================================================ ABOUT -->
+<section id="panel-about" role="tabpanel" aria-labelledby="tab-about" class="panel prose" hidden>
+  <h2>About this demo</h2>
+  <p><strong>What an audit looks for.</strong> One way to test a pricing agent for collusion is to replay the market with and without a rival price cut and ask: does the agent keep its own price lower for several periods afterwards? A lasting response looks like punishment, the mechanism that holds tacit collusion together.</p>
+  <p><strong>Execution rules.</strong> Many markets put rules between a price decision and the price customers see. Germany's 2026 fuel-price “noon rule” allows increases only at 12:00 while cuts are allowed at any time; Western Australia's FuelWatch locks each price for 24 hours; platforms can hold an offer for a set time. Here “Hold” and “Noon rule” are simplified versions of these.</p>
+  <p><strong>What the demo shows.</strong> A myopic agent that only best-responds to today's rival price returns to normal right away. Behind a hold, its published price stays down anyway, so an auditor reading published prices sees what looks like punishment. Comparing proposed with published prices separates the rule's effect from the agent's. With a real LLM (Qwen3-235B), the rule also changes the proposals, because the model anchors on its own held-down price.</p>
+  <p><strong>Limits.</strong> Synthetic linear market, scripted rival, one model, small samples. This demo does not show that any firm or model colludes, and it is not legal advice.</p>
+  <p>Code and paper: <a href="https://github.com/kaiser-data/auditing-llm-pricing-agents">github.com/kaiser-data/auditing-llm-pricing-agents</a> (may still be private). Martin Kaiser, Apart Research AI Collusion Sprint.</p>
+</section>
+</main>
+
+<div class="tooltip" id="tooltip" role="status" hidden></div>
+<script>
+  window.SAVE_ENDPOINT = "https://yjgtdbogiauptmtdituu.supabase.co/functions/v1/scenarios";
+  window.LOAD_ENDPOINT = "https://yjgtdbogiauptmtdituu.supabase.co/functions/v1/scenarios";
+</script>
+<script src="sim.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

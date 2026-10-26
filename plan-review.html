@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Execution Audit Plan</title>
+<style>
+/* Layout: one reading column; status band, then decisions, then evidence, then schedule. */
+:root {
+  --bg: #f6f7f5; --surface: #ffffff; --fg: #1d2421; --muted: #5d6762; --line: #d9dfdb;
+  --accent: #1f6f5c; --accent-soft: #e2efe9; --warn: #9a5b00; --warn-soft: #fbf0dc;
+  --pub: #1f6f5c; --prop: #b4532a; --ghost: #9aa5a0;
+  --display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --body: -apple-system, "Segoe UI", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141917; --surface: #1c2320; --fg: #e4ebe7; --muted: #9aa7a1; --line: #2e3833;
+  --accent: #6cc3a7; --accent-soft: #1f322b; --warn: #e3a64a; --warn-soft: #3a2d17;
+  --pub: #6cc3a7; --prop: #e98a5f; --ghost: #5d6a64; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141917; --surface: #1c2320; --fg: #e4ebe7; --muted: #9aa7a1; --line: #2e3833;
+  --accent: #6cc3a7; --accent-soft: #1f322b; --warn: #e3a64a; --warn-soft: #3a2d17;
+  --pub: #6cc3a7; --prop: #e98a5f; --ghost: #5d6a64; color-scheme: dark }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 80px }
+main { max-width: 860px; margin: 0 auto; display: grid; gap: 40px }
+h1, h2 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; line-height: 1.2 }
+h1 { font-size: 2.1rem } h2 { font-size: 1.45rem; margin-bottom: 12px }
+h3 { font-size: 1rem; margin: 0 0 6px }
+p { margin: 0 0 10px; max-width: 68ch }
+.eyebrow { font: 600 .75rem/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.lede { font-size: 1.1rem; color: var(--muted); max-width: 64ch }
+.claim { font-family: var(--display); font-size: 1.2rem; line-height: 1.5; border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; max-width: 64ch }
+.status { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px }
+.status div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px }
+.status b { display: block; font-size: .8rem; color: var(--muted); font-weight: 600 }
+.pill { display: inline-block; font: 600 .72rem/1 var(--body); padding: 4px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent) }
+.pill.warn { background: var(--warn-soft); color: var(--warn) }
+.decisions { display: grid; gap: 12px; counter-reset: d }
+.decision { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 6px }
+.decision .rec { font-size: .9rem } .decision .rec b { color: var(--accent) }
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; font-variant-numeric: tabular-nums }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font-weight: 600; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em }
+tr:last-child td { border-bottom: 0 }
+td.num { font-family: var(--mono); white-space: nowrap }
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; min-width: 0 }
+figcaption { font-size: .82rem; color: var(--muted); margin-top: 6px }
+svg { width: 100%; height: auto; display: block }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .8rem; color: var(--muted) }
+.legend i { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin-right: 5px }
+ul { margin: 0; padding-left: 20px } li { margin-bottom: 4px; max-width: 68ch }
+code { font-family: var(--mono); font-size: .85em }
+.note { font-size: .85rem; color: var(--muted) }
+</style>
+</head>
+<body>
+<main>
+
+<header style="display:grid;gap:10px">
+  <span class="eyebrow">Apart AI Collusion Sprint · Track 2: Detection &amp; Audit · plan v2, Sun 25 Oct 23:40</span>
+  <h1>When Execution Looks Like Punishment</h1>
+  <p class="lede">Plan after the Codex review, plus what the pilot already shows. Five decisions for you are listed first. Deadline Mon 26 Oct 12:59 Berlin; target submit 12:15.</p>
+</header>
+
+<section class="status">
+  <div><b>Harness</b>24 tests pass <span class="pill">ready</span></div>
+  <div><b>Scripted controls</b>all give their known answer <span class="pill">ready</span></div>
+  <div><b>Pilot (Qwen3-235B)</b>4 histories, 412 calls <span class="pill">done</span></div>
+  <div><b>Main run</b>16 histories × 4 repeats, ~3,200 calls. Restarted 23:55 after Nebius "worker overloaded" errors <span class="pill warn">running</span></div>
+</section>
+
+<section>
+  <h2>The claim</h2>
+  <p class="claim">A platform rule that holds a new price for three periods changes the published prices after a rival's price cut, and it also changes what the AI agent proposes next, because the agent learns from the prices it sees published. So logging proposals exposes the platform's effect but does not tell you how the model would behave without the rule.</p>
+  <p class="note">Collusion definition we use: the market one (prices above the competitive level, sustained by punishing rivals who cut). We test whether the punishment signature that audits look for can come from the platform rather than the model. One LLM against a scripted rival, so this is an audit-validity study, not evidence of collusion between agents.</p>
+</section>
+
+<section>
+  <h2>Your decisions</h2>
+  <div class="decisions">
+    <div class="decision">
+      <h3>1. How we write the paper</h3>
+      <p>The official template is a Google Doc. The rules say judges skip papers they can't follow, and the template asks that the team writes the final text.</p>
+      <p class="rec"><b>Recommend:</b> I draft in Markdown and convert it to a Word file with the template's styles (already downloaded to <code>paper/apart-template.docx</code>). You open it in Google Docs, rewrite the intro, contributions and discussion in your own words, and export the PDF.</p>
+    </div>
+    <div class="decision">
+      <h3>2. What the AI agent knows</h3>
+      <p>Codex suggested giving the agent the demand formula. The pilot ran without it: the agent sees only its published prices, the rival's prices, its sales and its profit, and is not told about the lock.</p>
+      <p class="rec"><b>Recommend:</b> keep it as piloted, which is closer to a real deployment. Changing the prompt now would mean another pilot.</p>
+    </div>
+    <div class="decision">
+      <h3>3. One optional extra run</h3>
+      <p>Tell the agent about the lock in its prompt and see whether its proposals still get stuck. About 10 minutes of calls.</p>
+      <p class="rec"><b>Recommend:</b> run it only if the analysis is done by 00:30.</p>
+    </div>
+    <div class="decision">
+      <h3>4. Title</h3>
+      <p class="rec"><b>Recommend:</b> "When Execution Looks Like Punishment: Price Commitments in LLM Pricing Audits" (from Codex). Alternative: "Audit the Whole Stack".</p>
+    </div>
+    <div class="decision">
+      <h3>5. Author line and code</h3>
+      <p>I need your author name and affiliation, and whether the code goes in a public GitHub repo. The repo is optional; judges score only the PDF.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>What the pilot shows</h2>
+  <p>Same market history, rival cuts its price by €8 for one period, then returns. Left: a scripted myopic agent. Right: Qwen3-235B, pilot history 5, repeat 0. Solid lines are published prices, dashed lines are proposals.</p>
+  <div class="legend">
+    <span><i style="background:var(--pub)"></i>published, 3-period lock</span>
+    <span><i style="background:var(--prop)"></i>proposed, 3-period lock</span>
+    <span><i style="background:var(--ghost)"></i>no lock</span>
+  </div>
+  <div class="charts" style="margin-top:10px">
+    <figure><svg id="c1" viewBox="0 0 360 220" role="img" aria-label="Myopic agent price paths"></svg>
+      <figcaption>Myopic agent: the lock holds €35 for two more periods, but the proposals go straight back to €37. The proposal log separates the two cleanly.</figcaption></figure>
+    <figure><svg id="c2" viewBox="0 0 360 220" role="img" aria-label="Qwen price paths"></svg>
+      <figcaption>Qwen: without the lock it recovers to about €40 by period 3. With the lock its own proposals stay near €35–36 for all 8 periods. One example trajectory.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>Numbers so far</h2>
+  <p>R = how far prices stay below the no-shock branch in periods 2–5 after the cut, as a share of the gap between the competitive price (€36) and the monopoly price (€51.75). θ = R with the lock minus R without it. Brackets show 95% bootstrap intervals across market histories.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Agent</th><th>n</th><th>θ published</th><th>θ proposed</th><th>R proposed, no lock</th><th>Reads as</th></tr></thead>
+    <tbody>
+      <tr><td>Fixed price</td><td class="num">16</td><td class="num">0.000</td><td class="num">0.000</td><td class="num">0.000</td><td>plumbing check passes</td></tr>
+      <tr><td>Myopic best response</td><td class="num">16</td><td class="num">0.073 [0.069, 0.077]</td><td class="num">0.000</td><td class="num">0.000</td><td>lock-only persistence; formula gives 0.076</td></tr>
+      <tr><td>Sticky, λ = 0.6</td><td class="num">16</td><td class="num">0.034 [0.030, 0.038]</td><td class="num">0.000</td><td class="num">0.008</td><td>persistence inside the agent</td></tr>
+      <tr><td>Sticky, λ = 0.3</td><td class="num">16</td><td class="num">0.005 [0.002, 0.009]</td><td class="num">0.000</td><td class="num">0.054</td><td>persistence inside the agent</td></tr>
+      <tr><td>Finite trigger</td><td class="num">16</td><td class="num">0.000</td><td class="num">0.000</td><td class="num">0.317</td><td>real punishment, lock adds nothing</td></tr>
+      <tr><td><b>Qwen3-235B (pilot)</b></td><td class="num">4</td><td class="num">0.201 [0.145, 0.258]</td><td class="num"><b>0.170 [0.123, 0.216]</b></td><td class="num">0.044 [−0.019, 0.103]</td><td>the lock changes the proposals too</td></tr>
+      <tr><td>Qwen, replay through lock</td><td class="num">4</td><td class="num">0.055 [0.020, 0.094]</td><td class="num">—</td><td class="num">—</td><td>what the lock alone would do</td></tr>
+    </tbody>
+  </table></div>
+  <p style="margin-top:12px"><b>Main pilot finding:</b> the lock adds 0.20 to published persistence for Qwen. Holding the prices alone (the replay) explains only 0.055. The rest comes from the agent itself staying low after it sees its own price held down.</p>
+  <figure style="margin-top:12px"><img src="paper/fig-lags.png" alt="Lag profiles for four agents">
+    <figcaption>Draft Figure 1 (controls + pilot). Gap to the no-shock branch at each period after the cut, ÷G. The grey band marks the measurement window h = 2–5. For Qwen, the proposals under the lock (dashed) stay low through period 8, while the replay (dotted blue) recovers at period 4.</figcaption></figure>
+  <figure style="margin-top:12px;max-width:420px"><img src="paper/fig-theta.png" alt="Theta per agent with intervals">
+    <figcaption>Draft Figure 2 (controls + pilot). θ per agent with 95% bootstrap intervals over histories.</figcaption></figure>
+  <p class="note" style="margin-top:8px">Pilot uses 4 histories and 2 repeats, and is excluded from the main analysis. Sham check (no-op vs no-op): published R ≈ −0.01 to −0.02, so sampling noise is small next to 0.17. The main run uses 16 new seeded histories.</p>
+</section>
+
+<section>
+  <h2>What the Codex review changed</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Severity</th><th>Issue</th><th>Fix</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>fatal</td><td>Two gates were wrong: a trigger's θ should be 0, and no-op runs can differ between with and without the lock</td><td>Positive control is R &gt; 0 with recovery; duplicate check only within the same executor</td><td><span class="pill">done</span></td></tr>
+      <tr><td>fatal</td><td>Demand can go negative at high prices</td><td>Demand floored at 0; €51.75 used only as a continuous reference</td><td><span class="pill">done</span></td></tr>
+      <tr><td>major</td><td>Trigger fired on the rival's return from a raise</td><td>Fixed reference price from the warm-up</td><td><span class="pill">done, tested</span></td></tr>
+      <tr><td>major</td><td>Lock rules not exact</td><td>Blocked proposals dropped; a 1-period lock behaves like no lock</td><td><span class="pill">done, tested</span></td></tr>
+      <tr><td>major</td><td>Window h = 2–5 mixes locked and free periods</td><td>Keep it as the main measure; also show all 8 periods, h = 2–3 and h = 4–8</td><td><span class="pill warn">in analysis</span></td></tr>
+      <tr><td>major</td><td>12 histories, 2 repeats too thin</td><td>16 seeded histories, 4 repeats</td><td><span class="pill">running</span></td></tr>
+      <tr><td>major</td><td>Auditor-verdict figure overclaims</td><td>Replaced by the replay comparison</td><td><span class="pill">done</span></td></tr>
+      <tr><td>best addition</td><td>Open-loop replay</td><td>Run the no-lock proposals through the lock afterwards. The gap to the real lock run is the extra effect of the agent adapting.</td><td><span class="pill">coded, no API cost</span></td></tr>
+      <tr><td>cut</td><td>Second model, lock-length sweep, disclosure factor</td><td>Out of scope tonight (disclosure only as the optional run above)</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Rules that shape the paper</h2>
+  <ul>
+    <li>Up to 8 pages; references and appendices don't count. The template suggests about 4: intro and related work 1 page, methods and results 2.5, discussion 0.5.</li>
+    <li>Abstract of 150–250 words. Mandatory "Limitations and Dual-Use / Ethical Considerations" appendix and LLM Usage Statement.</li>
+    <li>Prior work must be disclosed: the Oct 13 idea briefs and the Oct 19 and 23 Codex reviews were pre-sprint ideas, and all code was written during the sprint.</li>
+    <li>Judges score impact and innovation, execution quality, and presentation and clarity, 1–5 each. Only the PDF is scored.</li>
+    <li>Deadline Mon 11:59 UTC = 12:59 Berlin. A corrected PDF means a new submission.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Schedule (Berlin)</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Time</th><th>Work</th><th>Gate</th></tr></thead>
+    <tbody>
+      <tr><td class="num">23:40–00:00</td><td>You review this page and answer the 5 decisions</td><td>A design change means rerunning the main run (~20 min)</td></tr>
+      <tr><td class="num">00:00–00:45</td><td>Main run complete → completeness check, analysis, 3 figures</td><td>No missing trajectories; failed calls never filled in with the last price</td></tr>
+      <tr><td class="num">00:45–02:00</td><td>I draft the full paper in the template structure, with numbers from one results file</td><td>Word file opens with the template's styles</td></tr>
+      <tr><td class="num">02:00–07:00</td><td>Sleep</td><td>—</td></tr>
+      <tr><td class="num">07:00–09:30</td><td>You rewrite the intro, contributions and discussion in your voice; I check every number</td><td>Abstract 150–250 words</td></tr>
+      <tr><td class="num">09:30–11:00</td><td>Appendix: limitations and dual use, disclosure, prompt, run diagnostics</td><td>All claims traced to <code>results/</code></td></tr>
+      <tr><td class="num">11:00–12:15</td><td>Final read, PDF export, submit, confirm</td><td>12:59 hard deadline</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Figures planned</h2>
+  <ul>
+    <li><b>Figure 1.</b> Price paths, proposed vs published, for the myopic agent and Qwen, with and without the lock (as above, averaged over histories).</li>
+    <li><b>Figure 2.</b> θ for published prices, proposed prices and the replay, per agent, with intervals.</li>
+    <li><b>Figure 3.</b> Lag profile, periods 1–8 after the cut, for Qwen: real lock run vs replay vs no lock.</li>
+  </ul>
+  <p class="note" style="margin-top:8px">Files: <code>PLAN.md</code>, <code>codex-plan-review-2026-10-25.md</code>, <code>harness/</code>, <code>tests/</code>, <code>runs/</code>.</p>
+</section>
+
+</main>
+<script>
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function chart(id, series, lo, hi) {
+  const svg = document.getElementById(id), W = 360, H = 220, L = 36, R = 10, T = 12, B = 30;
+  const x = h => L + h * (W - L - R) / 8, y = p => T + (hi - p) * (H - T - B) / (hi - lo);
+  let s = '';
+  for (let p = lo; p <= hi; p += 2) s += `<line x1="${L}" x2="${W - R}" y1="${y(p)}" y2="${y(p)}" stroke="${css('--line')}" stroke-width="1"/><text x="${L - 6}" y="${y(p) + 4}" text-anchor="end" font-size="10" fill="${css('--muted')}">€${p}</text>`;
+  for (let h = 0; h <= 8; h++) s += `<text x="${x(h)}" y="${H - 12}" text-anchor="middle" font-size="10" fill="${css('--muted')}">${h}</text>`;
+  s += `<text x="${(L + W - R) / 2}" y="${H - 1}" text-anchor="middle" font-size="10" fill="${css('--muted')}">periods after the shock (0 = cut)</text>`;
+  for (const [vals, color, dash] of series) {
+    const d = vals.map((v, h) => `${h ? 'L' : 'M'}${x(h).toFixed(1)},${y(v).toFixed(1)}`).join('');
+    s += `<path d="${d}" fill="none" stroke="${css(color)}" stroke-width="2.2" ${dash ? 'stroke-dasharray="5 4"' : ''}/>`;
+  }
+  svg.innerHTML = s;
+}
+function draw() {
+  chart('c1', [
+    [[37, 35, 37, 37, 37, 37, 37, 37, 37], '--ghost'],
+    [[37, 35, 35, 35, 37, 37, 37, 37, 37], '--pub'],
+    [[37, 35, 37, 37, 37, 37, 37, 37, 37], '--prop', true],
+  ], 32, 42);
+  chart('c2', [
+    [[40.5, 33, 34, 39.5, 39.5, 40, 40, 40.5, 40.5], '--ghost'],
+    [[40.5, 35, 35, 35, 35, 35, 35, 36, 36], '--pub'],
+    [[40.5, 35, 37.5, 36.5, 35, 35, 35, 36, 36], '--prop', true],
+  ], 32, 42);
+}
+draw();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+</script>
+</body>
+</html>
