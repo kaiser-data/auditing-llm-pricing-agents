@@ -113,7 +113,7 @@ Table: Does telling the agent more help? Qwen3-235B under the hold with three pr
 | Show own proposals | 11 [7, 15] | 10 [6, 14] | 7 [4, 10] |
 | Audit notice | 4 [1, 6] | 10 [6, 15] | 6 [3, 10] |
 
-# 5. Discussion and Limitations
+# 5. Discussion
 
 **Why the model's own pricing behaviour matters.** An agent can be given pricing rules, but when it has none for a situation, or loses them from a long context, its own sense of prices takes over. That underlying behaviour decides how it meets a rival's cut, whether the rival is another agent or a human-run shop, and whether a human owner gets the behaviour they expected.
 
@@ -127,21 +127,22 @@ Table: What each audit test tells an investigator (Qwen3-235B, hold; % of the co
 | Replay through the rule | How much is the rule alone? | 7% |
 | Published minus replay | How much is the agent itself? | 9% |
 
-**Audit security.** Three weaknesses follow. First, whoever sets the rule controls the signal: in our scripted sweep the apparent punishment of an innocent agent rises from 4% to 15% of the gap as the hold grows from two to six periods. Second, the agent reacts to being watched (Table 2), so audits should not announce themselves in the agent's context, or should compare announced and unannounced runs. Third, logs can be edited after the fact. Our later run logs are hash-chained, which shows edits but not omissions; the main Qwen run predates this.
+**Audit security and policy.** Whoever sets the rule controls the signal: the apparent punishment of an innocent scripted agent rises from 4% to 15% of the gap as the hold grows from two to six periods. Agents react to being watched (Table 2), so audits should not announce themselves. Logs can be edited, so firms that deploy AI pricing should keep tamper-evident logs of the proposed price, the published price and the rule state, as algorithmic trading already must (MiFID II, RTS 6); our later logs are hash-chained, the main Qwen run predates this. Tests should run under the real offer durations and timing rules (CMA 2026 recommends stress tests) and be repeated for each deployed checkpoint, and the review of Germany's noon rule should check whether AI agents anchor on held prices.
 
-**Policy implications.** Four measures follow from the results:
 1. *Execution provenance.* Firms that deploy AI pricing should keep tamper-evident logs of the proposed price, the published price and the rule state for each decision. Algorithmic trading already has this duty (MiFID II, RTS 6).
 2. *Testing under the rules that apply.* Ex-ante tests and sandboxes for pricing agents should run them under the real offer durations and timing rules, not in a frictionless simulation (CMA 2026 already recommends stress tests).
 3. *Rule design with AI agents in mind.* Germany's noon rule is due for evaluation after one year. That review should check whether AI agents anchor on held prices.
 4. *Testing the model, not the label.* Rule effects differ between models of one family and between sizes, so tests should be repeated for each deployed checkpoint.
 
-**Limitations.** One synthetic market with nonbinding capacity and a scripted rival. Prompt variants and the noon rule are run on Qwen3-235B only; the panel adds the hold for nine more models and the no-rule response for 16 models from one provider, with one English prompt. Model comparisons are descriptive: checkpoints differ in more than size, headquarters does not identify training data, and failing endpoints were excluded (Appendix D). The checkpoint design measures the effect of switching a rule on, not its long-run effect on market prices. Sixteen histories give wide intervals for small effects. We never put two LLM agents against each other, so we say nothing about whether LLMs collude.
 
-**Future work.** More data, more cases, more models. Rules calibrated to the German and Western Australian fuel markets would show whether the pattern holds outside our synthetic duopoly. More models and prompt languages would show how far a model's own pricing behaviour carries over. The natural next step is to let two agents, or an agent and human players, meet under a shared rule.
 
 # 6. Conclusion
 
-Legal price rules can produce the punishment pattern that collusion audits look for. Under a three-period hold, a large part of Qwen3-235B's apparent punishment (9 of 16 percentage points) is the agent adapting its own proposals to the held price, so logging proposals alone does not clear it. Across 16 open models the behaviour differs, and the most interesting part is that it differs between sizes of the same family, with only ambiguous trends. Models that react more strongly to a cut tend to show a larger rule effect. To understand how a model really behaves, much more research is needed.
+**What we found.** Open models differ widely in how they meet a rival's price cut. Nemotron-3-Super and gpt-oss-120b ignore it, most models follow it partly, and Qwen3-30B cuts more than twice the profit-maximising amount. Neither developer country nor size sorts them: in Qwen the smaller model reacts more strongly, in Nemotron and MiniMax the smaller ones react little. A three-period hold makes 6 of 10 models look as if they punish, and it amplifies the reaction a model already has: the four strongest reactors (both Qwen models, DeepSeek-V4-Pro, Nemotron-3-Ultra) show the largest rule effects, while gpt-oss barely moves. For Qwen3-235B more than half of the effect (9 of 16 points) is the agent changing its own proposals after seeing a held price, so logging proposals alone does not clear it. Telling the agent about the rule, or showing it its own proposals, halves this but does not remove it, and an audit notice changes the agent's behaviour even without a rule.
+
+**What this does not show.** It is one synthetic market with a scripted rival, one provider and one English prompt; prompt variants and the noon rule ran on Qwen3-235B only, and 16 histories leave small effects uncertain. We never let two LLMs meet, so we say nothing about whether LLMs collude.
+
+**What is next.** More histories, rules calibrated to the German and Western Australian fuel markets, more prompt languages, and markets where two agents, or an agent and human players, meet under a shared rule.
 
 This matters because models will make financial decisions for us, in markets for goods, in stocks and in crypto. Understanding how models differ is part of keeping our economies safe. For AI safety auditors the practical lesson is to test the exact model under the rules it will face, recording proposals, published prices and rule state.
 
