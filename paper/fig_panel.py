@@ -22,7 +22,7 @@ from harness.sim import G  # noqa: E402
 OUT = Path(__file__).resolve().parent
 plt.rcParams.update({"font.family": "serif", "font.size": 8.5, "pdf.fonttype": 42, "axes.spines.top": False,
                      "axes.spines.right": False, "axes.titlesize": 9})
-COLOR = {"CN": "#b4532a", "US": "#1f6f5c"}
+COLOR = {"CN": "#1b2330", "US": "#1b2330"}  # neutral: orange/green mean proposed/published in Figs 1-2
 MARKER = {"CN": "o", "US": "s"}
 
 
@@ -60,7 +60,7 @@ def main(paths):
                 continue
             mean, lo, hi = a[key]
             ax.errorbar(mean, y, xerr=[[mean - lo], [hi - mean]], fmt=MARKER[o], color=COLOR[o], ms=4.5,
-                        elinewidth=1.2, capsize=0)
+                        elinewidth=1.2, capsize=0, mfc=COLOR[o] if o == "CN" else "white")
             print(f"{key:8s} {m:42s} {o} n={a['n_hist']:2d} {mean:.2f} [{lo:.2f}, {hi:.2f}]")
         ax.axvline(ref, color="#000000", lw=0.8, ls="--")
         if ref_label:
@@ -75,7 +75,7 @@ def main(paths):
             for ax in axes:
                 ax.axhline(y - 0.5, color="#000000", lw=0.4, alpha=0.35)
     axes[0].set_ylim(-0.6, len(res) - 0.1)
-    handles = [axes[1].plot([], [], MARKER[o], color=COLOR[o])[0] for o in ("CN", "US")]
+    handles = [axes[1].plot([], [], MARKER[o], color=COLOR[o], mfc=COLOR[o] if o == "CN" else "white")[0] for o in ("CN", "US")]
     fig.tight_layout(w_pad=1.0)
     fig.legend(handles, ["China-based developer", "US-based developer"], frameon=False, fontsize=7.5, ncol=2,
                loc="upper center", bbox_to_anchor=(0.5, 0.0))
